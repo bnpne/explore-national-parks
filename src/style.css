@@ -1,0 +1,46 @@
+* {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+li {
+  list-style-type: none;
+  text-decoration: none;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+.main {
+  position: absolute;
+  height: 100%;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.container {
+  position: absolute;
+  min-height: 100vh;
+  will-change: transform;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.list li {
+  margin-top: 3.2rem;
+  margin-right: 2rem;
+  margin-left: 2rem;
+  width: 12rem;
+  height: calc(24px + 12rem);
+}
