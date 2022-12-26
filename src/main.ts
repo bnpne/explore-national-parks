@@ -1,11 +1,10 @@
 import { renderer, scene } from "./core/renderer";
+import { camera } from "./core/camera";
 
 import "./style.css";
 
-console.log("hello world");
-
 const init = () => {
-  renderer.render(scene);
+  renderer.render(scene, camera);
   requestAnimationFrame(init);
 };
 

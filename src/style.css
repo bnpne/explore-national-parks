@@ -35,9 +35,11 @@ body {
 .list {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .list li {
+  flex: 1 0 21%;
   margin-top: 3.2rem;
   margin-right: 2rem;
   margin-left: 2rem;
