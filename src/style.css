@@ -39,7 +39,7 @@ body {
 }
 
 .list li {
-  flex: 1 0 21%;
+  flex: 0 0 21%;
   margin-top: 3.2rem;
   margin-right: 2rem;
   margin-left: 2rem;
