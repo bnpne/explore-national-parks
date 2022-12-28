@@ -1,22 +1,11 @@
-import { PerspectiveCamera } from 'three'
-import { scene, sizes } from './renderer'
+import { PerspectiveCamera } from "three";
+import { sizes } from "./helpers";
 
-const VERTICAL_FIELD_OF_VIEW = 45 // degrees 45 is the normal
+export const FOV = 45;
 
-export const camera = new PerspectiveCamera(
-  VERTICAL_FIELD_OF_VIEW,
-  sizes.width / sizes.height,
-)
+export const initCamera = () => {
+  const camera = new PerspectiveCamera(FOV, sizes.width / sizes.height);
+  camera.position.set(0, 0, 5);
 
-camera.position.set(9, 4, 9)
-
-window.addEventListener('resize', () => {
-  sizes.width = window.innerWidth
-  sizes.height = window.innerHeight
-  camera.aspect = sizes.width / sizes.height
-  camera.updateProjectionMatrix()
-})
-
-scene.add(camera)
-
-export default camera
+  return camera;
+};
