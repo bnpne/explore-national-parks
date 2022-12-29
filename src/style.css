@@ -24,6 +24,7 @@ body {
   top: 0;
   left: 0;
   width: 100%;
+  z-index: 1;
 }
 
 .container {
@@ -39,10 +40,9 @@ body {
 }
 
 .list li {
-  flex: 0 0 21%;
+  height: 144px;
+  width: 120px;
   margin-top: 3.2rem;
   margin-right: 2rem;
   margin-left: 2rem;
-  width: 12rem;
-  height: calc(24px + 12rem);
 }

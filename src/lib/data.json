@@ -1,0 +1,48 @@
+{
+  "data": {
+    "planes": [
+      {
+        "left": 30,
+        "top": 30,
+        "color": "#ff0000",
+        "height": 200,
+        "width": 160
+      },
+      {
+        "left": 500,
+        "top": 30,
+        "color": "#ff0000",
+        "height": 200,
+        "width": 160
+      },
+      {
+        "left": 690,
+        "top": 30,
+        "color": "#ff0000",
+        "height": 200,
+        "width": 160
+      },
+      {
+        "left": 30,
+        "top": 300,
+        "color": "#ff0000",
+        "height": 200,
+        "width": 160
+      },
+      {
+        "left": 340,
+        "top": 300,
+        "color": "#ff0000",
+        "height": 200,
+        "width": 160
+      },
+      {
+        "left": 340,
+        "top": 600,
+        "color": "#ff0000",
+        "height": 200,
+        "width": 160
+      }
+    ]
+  }
+}

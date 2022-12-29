@@ -1,8 +1,8 @@
-import { renderer, updateRenderer } from "./renderer";
+import { updateRenderer } from "./renderer";
 import { FOV } from "./camera";
 
-// Constants
-export const VIEWPORT = { height: 0, width: 0 }; // For using pixels when changing plane size
+// Variables needed throughout project
+export let viewport = { height: 0, width: 0 }; // For using pixels when changing plane size
 
 export let sizes = {
   width: window.innerWidth,
@@ -24,4 +24,10 @@ export const onResize = (camera) => {
   // Transform pixels in 3D environment
   const pixelFov = FOV * (Math.PI / 180);
   const pixelHeight = 2 * Math.tan(pixelFov / 2) * camera.position.z;
+  const pixelWidth = pixelHeight * camera.aspect;
+
+  viewport = {
+    width: pixelWidth,
+    height: pixelHeight,
+  };
 };

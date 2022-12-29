@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { sizes } from "./helpers";
+import { sizes, viewport } from "./helpers";
 
-import fragment from "../lib/fragment.glsl";
-import vertex from "../lib/vertex.glsl";
+import fragment from "../utils/fragment.glsl";
+import vertex from "../utils/vertex.glsl";
 
 export const createMedia = (mediaElement) => {
   const geometry = new THREE.PlaneGeometry(1, 1);
@@ -26,26 +26,45 @@ export const createMedia = (mediaElement) => {
 
   const planeTwo = new THREE.Mesh(geometry, material);
   // test plane
-  const testPlane = new THREE.Mesh(
+  const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(1, 1),
     new THREE.MeshBasicMaterial({ color: "#ff0000" })
   );
 
-  const bounds = mediaElement.getBoundingClientRect();
   const x = 0;
   const y = 0;
 
-  // plane.scale.set(
-  //   (sizes.width * bounds.width) / screen.width,
-  //   (sizes.height * bounds.height) / screen.height
-  // );
-  // plane.position.set(
-  //   -(sizes.width / 2) +
-  //     plane.scale.x / 2 +
-  //     ((bounds.left - x) / screen.width) * sizes.width,
-  //   sizes.height / 2 -
-  //     plane.scale.y / 2 -
-  //     ((bounds.top - y) / screen.height) * sizes.height
-  // );
-  return testPlane;
+  // Checks whether media element exists. This is if we want the webgl element taken from the DOM
+  if (mediaElement) {
+    plane.scale.set(
+      (viewport.width * mediaElement.width) / sizes.width,
+      (viewport.height * mediaElement.height) / sizes.height
+    );
+
+    plane.position.set(
+      -(viewport.width / 2) +
+        plane.scale.x / 2 +
+        ((mediaElement.left - x) / sizes.width) * viewport.width,
+      viewport.height / 2 -
+        plane.scale.y / 2 -
+        ((mediaElement.top - y) / sizes.height) * viewport.height
+    );
+  } else {
+    // Default if no mediaElement
+    plane.scale.set(
+      (viewport.width * 120) / sizes.width,
+      (viewport.height * 144) / sizes.height
+    );
+
+    plane.position.set(
+      -(viewport.width / 2) +
+        plane.scale.x / 2 +
+        ((30 - x) / sizes.width) * viewport.width,
+      viewport.height / 2 -
+        plane.scale.y / 2 -
+        ((30 - y) / sizes.height) * viewport.height
+    );
+  }
+
+  return plane;
 };
