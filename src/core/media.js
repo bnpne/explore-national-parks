@@ -1,70 +1,67 @@
-import * as THREE from "three";
-import { sizes, viewport } from "./helpers";
+import { Mesh, Program, Texture, Plane } from "ogl";
 
 import fragment from "../utils/fragment.glsl";
 import vertex from "../utils/vertex.glsl";
+import image from "../../assets/frankie-cordoba-CYKUI8JyEZ4-unsplash (1).jpg";
 
-export const createMedia = (mediaElement) => {
-  const geometry = new THREE.PlaneGeometry(1, 1);
-  const texture = new THREE.TextureLoader().load(
-    "../../assets/frankie-cordoba-CYKUI8JyEZ4-unsplash (1).jpg"
-  );
+function CreateMedia({ mediaElement, gl, viewport, sizes }) {
+  const texture = new Texture(gl, {
+    generateMipmaps: false,
+  });
 
-  // Get texture
-  const material = new THREE.RawShaderMaterial({
-    fragmentShader: fragment,
-    vertexShader: vertex,
+  const img = new Image();
+
+  img.src = "../../assets/frankie-cordoba-CYKUI8JyEZ4-unsplash (1).jpg";
+
+  img.onload = (_) => {
+    plane.program.uniforms.uImageSizes.value = [
+      img.naturalWidth,
+      img.naturalHeight,
+    ];
+    texture.image = img;
+  };
+
+  const planeGeometry = new Plane(gl, {
+    heightSegments: 10,
+  });
+
+  const program = new Program(gl, {
+    fragment,
+    vertex,
     uniforms: {
       tMap: { value: texture },
-      uPlaneSizes: { value: new THREE.Vector2(0, 0) },
-      uImageSizes: { value: new THREE.Vector2(0, 0) },
-      uViewportSizes: { value: new THREE.Vector2(sizes.width, sizes.height) },
+      uPlaneSizes: { value: [0, 0] },
+      uImageSizes: { value: [0, 0] },
+      uViewportSizes: { value: [viewport.width, viewport.height] },
       uStrength: { value: 0 },
     },
     transparent: true,
   });
 
-  const planeTwo = new THREE.Mesh(geometry, material);
-  // test plane
-  const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
-    new THREE.MeshBasicMaterial({ color: "#ff0000" })
-  );
+  const plane = new Mesh(gl, {
+    geometry: planeGeometry,
+    program,
+  });
 
   const x = 0;
   const y = 0;
 
   // Checks whether media element exists. This is if we want the webgl element taken from the DOM
-  if (mediaElement) {
-    plane.scale.set(
-      (viewport.width * mediaElement.width) / sizes.width,
-      (viewport.height * mediaElement.height) / sizes.height
-    );
+  plane.scale.x = (viewport.width * mediaElement.width) / sizes.width;
+  plane.scale.y = (viewport.height * mediaElement.height) / sizes.height;
 
-    plane.position.set(
-      -(viewport.width / 2) +
-        plane.scale.x / 2 +
-        ((mediaElement.left - x) / sizes.width) * viewport.width,
-      viewport.height / 2 -
-        plane.scale.y / 2 -
-        ((mediaElement.top - y) / sizes.height) * viewport.height
-    );
-  } else {
-    // Default if no mediaElement
-    plane.scale.set(
-      (viewport.width * 120) / sizes.width,
-      (viewport.height * 144) / sizes.height
-    );
+  plane.position.x =
+    -(viewport.width / 2) +
+    plane.scale.x / 2 +
+    ((mediaElement.left - x) / sizes.width) * viewport.width;
+  plane.position.y =
+    viewport.height / 2 -
+    plane.scale.y / 2 -
+    ((mediaElement.top - y) / sizes.height) * viewport.height;
 
-    plane.position.set(
-      -(viewport.width / 2) +
-        plane.scale.x / 2 +
-        ((30 - x) / sizes.width) * viewport.width,
-      viewport.height / 2 -
-        plane.scale.y / 2 -
-        ((30 - y) / sizes.height) * viewport.height
-    );
-  }
+  plane.program.uniforms.uPlaneSizes.value = [plane.scale.x, plane.scale.y];
 
   return plane;
-};
+}
+
+export default CreateMedia;

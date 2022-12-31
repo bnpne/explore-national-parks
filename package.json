@@ -12,7 +12,7 @@
     "vite": "^4.0.0"
   },
   "dependencies": {
-    "three": "^0.148.0",
+    "ogl": "^0.0.103",
     "vite-plugin-glsl": "^1.0.1"
   }
 }
