@@ -1,79 +1,123 @@
 import { Renderer, Camera, Transform } from "ogl";
-import CreateMedia from "./core/media";
+import Media from "./core/media";
 import { data } from "./lib/data.json";
 
 import "./style.css";
 
-// Create Renderer
-const renderer = new Renderer({
-  alpha: true,
-});
+class App {
+  constructor() {
+    this.createRenderer();
+    this.createCamera();
+    this.createScene();
 
-// Create canvas Node
-const gl = renderer.gl;
+    this.resize();
+    this.createMedia();
+    this.update();
+    this.addEventListeners();
+  }
 
-// Get Script node to add canvas above
-const script = document.querySelector("#script");
-document.body.insertBefore(gl.canvas, script);
-
-// Create Camera
-const camera = new Camera(gl);
-camera.position.z = 5;
-
-// Create Scene
-const scene = new Transform();
-
-// Size of viewport the camera sees
-let viewport = { height: 0, width: 0 }; // For using pixels when changing plane size
-
-// Size of Screen
-let sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-};
-
-// listen for the resize
-function resize() {
-  sizes = {
-    height: window.innerHeight,
-    width: window.innerWidth,
-  };
-
-  renderer.setSize(sizes.width, sizes.height);
-
-  camera.perspective({
-    aspect: gl.canvas.width / gl.canvas.height,
-  });
-
-  const fov = camera.fov * (Math.PI / 180);
-  const height = 2 * Math.tan(fov / 2) * camera.position.z;
-  const width = height * camera.aspect;
-
-  viewport = {
-    height: height,
-    width: width,
-  };
-}
-
-// Main Function
-// Here is where everything comes together
-function init() {
-  requestAnimationFrame(init);
-  // Create planes and add to scene
-  data.planes.map((el) => {
-    const plane = CreateMedia({
-      mediaElement: el,
-      gl: gl,
-      viewport: viewport,
-      sizes: sizes,
+  createRenderer() {
+    // Create Renderer
+    this.renderer = new Renderer({
+      alpha: true,
     });
-    plane.setParent(scene);
-  });
 
-  resize();
-  window.addEventListener("resize", resize());
+    // Create canvas Node
+    this.gl = this.renderer.gl;
 
-  renderer.render({ scene: scene, camera: camera });
+    // Get Script node to add canvas above
+    const script = document.querySelector("#script");
+    document.body.insertBefore(this.gl.canvas, script);
+  }
+
+  createCamera() {
+    // Create Camera
+    this.camera = new Camera(this.gl);
+    this.camera.fov = 45;
+    this.camera.position.z = 5;
+  }
+
+  createScene() {
+    // Create Scene
+    this.scene = new Transform();
+  }
+
+  createMedia() {
+    this.mediaList = data.planes.map((el) => {
+      const plane = new Media({
+        mediaElement: el,
+        gl: this.gl,
+        viewport: this.viewport,
+        sizes: this.sizes,
+        scene: this.scene,
+      });
+
+      return plane;
+    });
+  }
+
+  // listen for the resize
+  resize() {
+    this.sizes = {
+      height: window.innerHeight,
+      width: window.innerWidth,
+    };
+
+    this.renderer.setSize(this.sizes.width, this.sizes.height);
+
+    this.camera.perspective({
+      aspect: this.gl.canvas.width / this.gl.canvas.height,
+    });
+
+    const fov = this.camera.fov * (Math.PI / 180);
+    const height = 2 * Math.tan(fov / 2) * this.camera.position.z;
+    const width = height * this.camera.aspect;
+
+    this.viewport = {
+      height: height,
+      width: width,
+    };
+
+    if (this.mediaList) {
+      this.mediaList.forEach((el) =>
+        el.resize({
+          sizes: this.sizes,
+          viewport: this.viewport,
+        })
+      );
+    }
+  }
+
+  update() {
+    // Update media
+    if (this.mediaList) {
+      this.mediaList.forEach((el) => el.update());
+    }
+
+    // Start renderer
+    this.renderer.render({
+      scene: this.scene,
+      camera: this.camera,
+    });
+
+    requestAnimationFrame(this.update.bind(this));
+  }
+
+  // These are event handlers
+  addEventListeners() {
+    window.addEventListener("resize", this.resize.bind(this));
+
+    // window.addEventListener('mousewheel', this.onWheel.bind(this))
+    // window.addEventListener('wheel', this.onWheel.bind(this))
+    //
+    // window.addEventListener('mousedown', this.onTouchDown.bind(this))
+    // window.addEventListener('mousemove', this.onTouchMove.bind(this))
+    // window.addEventListener('mouseup', this.onTouchUp.bind(this))
+    //
+    // window.addEventListener('touchstart', this.onTouchDown.bind(this))
+    // window.addEventListener('touchmove', this.onTouchMove.bind(this))
+    // window.addEventListener('touchend', this.onTouchUp.bind(this))
+  }
 }
 
-init();
+new App();
