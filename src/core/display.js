@@ -5,16 +5,16 @@ import vertex from "../utils/vertex.glsl";
 
 const IMAGE_PATH = "../../assets/";
 
-export default class Media {
-  constructor({ mediaElement, gl, viewport, sizes, scene, src }) {
-    this.mediaElement = mediaElement;
+export default class Display {
+  constructor({ el, gl, viewport, sizes, scene, src }) {
+    this.el = el;
     this.gl = gl;
     this.viewport = viewport;
     this.sizes = sizes;
     this.scene = scene;
     this.src = src;
 
-    this.isHovering = false;
+    this.isHovering = true;
 
     this.createMesh();
     this.createBounds();
@@ -28,16 +28,16 @@ export default class Media {
     });
 
     // Get image
-    const img = new Image();
-    img.src = IMAGE_PATH + this.src;
+    this.img = new Image();
+    this.img.src = IMAGE_PATH + this.src;
 
     // Wait for image to load
-    img.onload = () => {
+    this.img.onload = () => {
       program.uniforms.uImageSizes.value = [
-        img.naturalWidth,
-        img.naturalHeight,
+        this.img.naturalWidth,
+        this.img.naturalHeight,
       ];
-      texture.image = img;
+      texture.image = this.img;
     };
 
     // Create geometry
@@ -72,7 +72,7 @@ export default class Media {
 
   // Handle scale and position of the plane
   createBounds() {
-    this.bounds = this.mediaElement.getBoundingClientRect();
+    this.bounds = this.el.getBoundingClientRect();
 
     this.updateScale();
     this.updatePosition();
@@ -98,12 +98,12 @@ export default class Media {
     this.plane.position.x =
       -(this.viewport.width / 2) +
       this.plane.scale.x / 2 +
-      ((this.bounds.left - x) / this.sizes.width) * this.viewport.width;
+      ((0 - x) / this.sizes.width) * this.viewport.width;
 
     this.plane.position.y =
       this.viewport.height / 2 -
       this.plane.scale.y / 2 -
-      ((this.bounds.top - y) / this.sizes.height) * this.viewport.height;
+      ((0 - y) / this.sizes.height) * this.viewport.height;
   }
 
   hide() {
@@ -115,9 +115,11 @@ export default class Media {
   }
 
   updateAlpha() {
-    this.isHovering
-      ? (this.plane.program.uniforms.uAlpha.value = 0)
-      : (this.plane.program.uniforms.uAlpha.value = 1);
+    if (this.isHovering) {
+      this.plane.program.uniforms.uAlpha.value = 0;
+    } else {
+      this.plane.program.uniforms.uAlpha.value = 1;
+    }
   }
 
   update() {
