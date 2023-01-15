@@ -2,51 +2,51 @@
   "data": {
     "planes": [
       {
-        "left": 3,
-        "top": 3,
+        "left": 17.8,
+        "top": 18.3,
         "color": "#ff0000",
-        "height": 20,
-        "width": 16,
+        "height": 17,
+        "width": 14,
         "src": "mio-ito-B_SLtmXPKNA-unsplash.jpg"
       },
       {
-        "left": 50,
-        "top": 3,
+        "left": 65.1,
+        "top": 18.3,
         "color": "#ff0000",
-        "height": 20,
-        "width": 16,
+        "height": 17,
+        "width": 14,
         "src": "mio-ito-B_SLtmXPKNA-unsplash.jpg"
       },
       {
-        "left": 69,
-        "top": 3,
+        "left": 112.7,
+        "top": 18.3,
         "color": "#ff0000",
-        "height": 20,
-        "width": 16,
+        "height": 17,
+        "width": 14,
         "src": "mio-ito-B_SLtmXPKNA-unsplash.jpg"
       },
       {
-        "left": 3,
-        "top": 30,
+        "left": 17.8,
+        "top": 65.8,
         "color": "#ff0000",
-        "height": 20,
-        "width": 16,
+        "height": 17,
+        "width": 14,
         "src": "mio-ito-B_SLtmXPKNA-unsplash.jpg"
       },
       {
-        "left": 34,
-        "top": 30,
+        "left": 65.1,
+        "top": 65.8,
         "color": "#ff0000",
-        "height": 20,
-        "width": 16,
+        "height": 17,
+        "width": 14,
         "src": "mio-ito-B_SLtmXPKNA-unsplash.jpg"
       },
       {
-        "left": 34,
-        "top": 57,
+        "left": 112.7,
+        "top": 65.8,
         "color": "#ff0000",
-        "height": 20,
-        "width": 16,
+        "height": 17,
+        "width": 14,
         "src": "mio-ito-B_SLtmXPKNA-unsplash.jpg"
       }
     ]

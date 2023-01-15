@@ -1,143 +1,95 @@
-import { Renderer, Camera, Transform } from "ogl";
-import Media from "./core/media";
-import Display from "./core/display";
-import { data } from "./lib/data.json";
+import * as THREE from "three";
+import data from "./lib/data.json";
 
 import "./style.css";
 
 class App {
   constructor() {
-    this.createRenderer();
-    this.createCamera();
-    this.createScene();
-
-    this.resize();
-
-    this.createDOM();
-    this.createMedia();
-    // this.createDisplay();
-
-    // this.createDOMListener();
-
-    this.addEventListeners();
-    this.update();
-  }
-
-  // Create Renderer
-  createRenderer() {
-    this.renderer = new Renderer({
+    this.canvas = document.getElementById("r");
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+      antialias: true,
       alpha: true,
     });
-
-    // Create canvas Node
-    this.gl = this.renderer.gl;
-
-    // Get Script node to add canvas above
-    const script = document.querySelector("#script");
-    document.body.insertBefore(this.gl.canvas, script);
-  }
-
-  // Create Camera
-  createCamera() {
-    this.camera = new Camera(this.gl);
-    this.camera.fov = 45;
-    this.camera.position.z = 5;
-  }
-
-  // Create Scene
-  createScene() {
-    this.scene = new Transform();
-  }
-
-  // Create DOM elements
-  createDOM() {
-    //Fill Here
-  }
-
-  // Create webGL planes
-  createMedia() {}
-
-  // Create big display image
-  createDisplay() {}
-
-  // listen for the resize
-  resize() {
-    this.sizes = {
+    this.screen = {
       height: window.innerHeight,
       width: window.innerWidth,
     };
-
-    this.renderer.setSize(this.sizes.width, this.sizes.height);
-
-    this.camera.perspective({
-      aspect: this.gl.canvas.width / this.gl.canvas.height,
-    });
-
-    const fov = this.camera.fov * (Math.PI / 180);
-    const height = 2 * Math.tan(fov / 2) * this.camera.position.z;
-    const width = height * this.camera.aspect;
-
-    this.viewport = {
-      height: height,
-      width: width,
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(
+      45,
+      this.screen.width / this.screen.height,
+      100,
+      2000
+    );
+    this.camera.position.set(600);
+    this.camera.fov =
+      2 * Math.atan(this.screen.height / 2 / 600) * (180 / Math.PI);
+    this.time = 0;
+    this.scroll = {
+      current: 0,
+      target: 0,
+      ease: 0.075,
     };
 
-    // if (this.mediaList) {
-    //   this.mediaList.forEach((el) =>
-    //     el.resize({
-    //       sizes: this.sizes,
-    //       viewport: this.viewport,
-    //     })
-    //   );
-    // }
-
-    // if (this.displayList) {
-    //   this.displayList.forEach((el) =>
-    //     el.resize({
-    //       sizes: this.sizes,
-    //       viewport: this.viewport,
-    //     })
-    //   );
-    // }
+    this.createImg();
+    this.resize();
+    this.loop();
+    this.initEvents();
   }
 
-  update() {
+  // Create webGL planes
+  createImg() {
+    this.imgList = data.planes.map((el, i) => {
+      const img = new Media({
+        src: el.src,
+        top: el.top,
+        left: el.left,
+        width: el.width,
+        height: el.height,
+        screen: this.screen,
+      });
+
+      this.scene.add(img);
+
+      return img;
+    });
+  }
+
+  // listen for the resize
+  resize() {
+    this.screen = {
+      height: window.innerHeight,
+      width: window.innerWidth,
+    };
+    this.renderer.setSize(this.screen.width, this.screen.height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+
+    // const fov = this.camera.fov * (Math.PI / 180);
+    // const height = 2 * Math.tan(fov / 2) * this.camera.position.z;
+    // const width = height * this.camera.aspect;
+    //
+    // this.viewport = {
+    //   height: height,
+    //   width: width,
+    // };
+  }
+
+  loop() {
     // Update media
     // if (this.mediaList) {
     //   this.mediaList.forEach((el) => el.update());
     // }
 
-    // // Update display
-    // if (this.displayList) {
-    //   this.displayList.forEach((el) => el.update());
-    // }
-
     // Start renderer
-    this.renderer.render({
-      scene: this.scene,
-      camera: this.camera,
-    });
+    this.renderer.render(this.scene, this.camera);
 
-    requestAnimationFrame(this.update.bind(this));
-  }
-
-  createDOMListener() {
-    this.DOMPlanes.forEach((el, i) => {
-      el.addEventListener("mouseover", () => {
-        // Hide element we are hovering over and show the display
-        this.mediaList[i].hide();
-        this.displayList[i].show();
-      });
-      el.addEventListener("mouseout", () => {
-        this.mediaList[i].show();
-        this.displayList[i].hide();
-      });
-    });
+    window.requestAnimationFrame(this.loop.bind(this));
   }
 
   // These are event handlers
-  addEventListeners() {
-    window.addEventListener("resize", this.resize.bind(this));
+  initEvents() {
+    window.addEventListener("resize", this.resize);
 
     // window.addEventListener('mousewheel', this.onWheel.bind(this))
     // window.addEventListener('wheel', this.onWheel.bind(this))

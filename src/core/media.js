@@ -1,35 +1,47 @@
-import { Mesh, Program, Texture, Plane } from "ogl";
-
+import * as THREE from "three";
 import fragment from "../utils/fragment.glsl";
 import vertex from "../utils/vertex.glsl";
 
 const IMAGE_PATH = "../../assets/";
 
 export default class Media {
-  constructor({ mediaElement, gl, viewport, sizes, scene, src }) {
-    this.mediaElement = mediaElement;
-    this.gl = gl;
-    this.viewport = viewport;
-    this.sizes = sizes;
-    this.scene = scene;
+  constructor({ src, height, width, top, left, screen }) {
     this.src = src;
+    this.height = height;
+    this.width = width;
+    this.top = top;
+    this.left = left;
+    this.screen = screen;
 
-    this.isHovering = false;
+    this.geometry = new THREE.PlaneGeometry(1, 1);
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        u_image: { value: 0 },
+      },
+      fragmentShader: `
+              varying vec2 v_uv;
+              uniform sampler2D u_image;
+              void main(){
+                  vec4 img = texture2D(u_image, v_uv);
+                  gl_FragColor = img;
+              }`,
+      vertexShader: `
+              varying vec2 v_uv;
+              void main(){
+                  v_uv = uv;
+                  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
+              }`,
+    });
 
     this.createMesh();
     this.createBounds();
-
     this.resize();
   }
 
   createMesh() {
-    const texture = new Texture(this.gl, {
-      generateMipmaps: false,
-    });
-
-    // Get image
     const img = new Image();
     img.src = IMAGE_PATH + this.src;
+    texture;
 
     // Wait for image to load
     img.onload = () => {
@@ -37,95 +49,22 @@ export default class Media {
         img.naturalWidth,
         img.naturalHeight,
       ];
-      texture.image = img;
+      let texture = new THREE.Texture(img);
+      texture.generateMipmaps = false;
+      texture.minFilter = THREE.LinearFilter;
+      texture.needsUpdate = true;
+      this.material.uniforms.u_image.value = texture;
     };
 
-    // Create geometry
-    const planeGeometry = new Plane(this.gl, {
-      heightSegments: 10,
-    });
-
-    // Create program
-    const program = new Program(this.gl, {
-      fragment,
-      vertex,
-      uniforms: {
-        tMap: { value: texture },
-        uPlaneSizes: { value: [0, 0] },
-        uImageSizes: { value: [0, 0] },
-        uViewportSizes: { value: [this.viewport.width, this.viewport.height] },
-        uStrength: { value: 0 },
-        uAlpha: { value: 0 },
-      },
-      transparent: true,
-    });
-
-    // Create plane with geometry and program we created
-    this.plane = new Mesh(this.gl, {
-      geometry: planeGeometry,
-      program,
-    });
-
-    // Add plane to scene
-    this.plane.setParent(this.scene);
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
   }
 
   // Handle scale and position of the plane
   createBounds() {
-    this.bounds = this.mediaElement.getBoundingClientRect();
+    this.mesh.scale.set(this.width, this.height);
 
-    this.updateScale();
-    this.updatePosition();
-
-    this.plane.program.uniforms.uPlaneSizes.value = [
-      this.plane.scale.x,
-      this.plane.scale.y,
-    ];
-  }
-
-  updateScale() {
-    this.plane.scale.x =
-      (this.viewport.width * this.bounds.width) / this.sizes.width;
-
-    this.plane.scale.y =
-      (this.viewport.height * this.bounds.height) / this.sizes.height;
-  }
-
-  updatePosition() {
-    const x = 0;
-    const y = 0;
-
-    this.plane.position.x =
-      -(this.viewport.width / 2) +
-      this.plane.scale.x / 2 +
-      ((this.bounds.left - x) / this.sizes.width) * this.viewport.width;
-
-    this.plane.position.y =
-      this.viewport.height / 2 -
-      this.plane.scale.y / 2 -
-      ((this.bounds.top - y) / this.sizes.height) * this.viewport.height;
-  }
-
-  hide() {
-    this.isHovering = true;
-  }
-
-  show() {
-    this.isHovering = false;
-  }
-
-  updateAlpha() {
-    this.isHovering
-      ? (this.plane.program.uniforms.uAlpha.value = 0)
-      : (this.plane.program.uniforms.uAlpha.value = 1);
-  }
-
-  update() {
-    // Handle scroll here
-
-    this.updateScale();
-    this.updatePosition();
-    this.updateAlpha();
+    this.mesh.position.y = -this.top + this.screen.height / 2 - this.height / 2;
+    this.mesh.position.x = this.left - this.screen.width / 2 + this.width / 2;
   }
 
   resize(s) {
