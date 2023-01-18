@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import data from "./lib/data.json";
+import Media from "./core/media";
+import { data } from "./lib/data.json";
 
 import "./style.css";
 
@@ -15,16 +16,18 @@ class App {
       height: window.innerHeight,
       width: window.innerWidth,
     };
+    this.renderer.setSize(this.screen.width, this.screen.height);
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
-      45,
+      75,
       this.screen.width / this.screen.height,
-      100,
-      2000
+      0.1,
+      100
     );
-    this.camera.position.set(600);
-    this.camera.fov =
-      2 * Math.atan(this.screen.height / 2 / 600) * (180 / Math.PI);
+    this.camera.position.set(0, 0, 5);
+    // this.camera.fov =
+    // 2 * Math.atan(this.screen.height / 2 / 600) * (180 / Math.PI);
+    this.scene.add(this.camera);
     this.time = 0;
     this.scroll = {
       current: 0,
@@ -42,15 +45,11 @@ class App {
   createImg() {
     this.imgList = data.planes.map((el, i) => {
       const img = new Media({
-        src: el.src,
-        top: el.top,
-        left: el.left,
-        width: el.width,
-        height: el.height,
+        element: el,
+        viewport: this.viewport,
         screen: this.screen,
+        scene: this.scene,
       });
-
-      this.scene.add(img);
 
       return img;
     });
@@ -65,21 +64,26 @@ class App {
     this.renderer.setSize(this.screen.width, this.screen.height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
-    // const fov = this.camera.fov * (Math.PI / 180);
-    // const height = 2 * Math.tan(fov / 2) * this.camera.position.z;
-    // const width = height * this.camera.aspect;
-    //
-    // this.viewport = {
-    //   height: height,
-    //   width: width,
-    // };
+    const fov = this.camera.fov * (Math.PI / 180);
+    const height = 2 * Math.tan(fov / 2) * this.camera.position.z;
+    const width = height * this.camera.aspect;
+
+    this.viewport = {
+      height: height,
+      width: width,
+    };
+
+    if (this.imgList) {
+      this.imgList.forEach((el) => {
+        el.resize({ screen: this.screen, viewport: this.viewport });
+      });
+    }
   }
 
   loop() {
-    // Update media
-    // if (this.mediaList) {
-    //   this.mediaList.forEach((el) => el.update());
-    // }
+    if (this.imgList) {
+      this.imgList.forEach((el) => el.loop());
+    }
 
     // Start renderer
     this.renderer.render(this.scene, this.camera);

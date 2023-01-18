@@ -1,17 +1,15 @@
 import * as THREE from "three";
-import fragment from "../utils/fragment.glsl";
-import vertex from "../utils/vertex.glsl";
+import fragment from "../shaders/fragment.glsl";
+import vertex from "../shaders/vertex.glsl";
 
 const IMAGE_PATH = "../../assets/";
 
 export default class Media {
-  constructor({ src, height, width, top, left, screen }) {
-    this.src = src;
-    this.height = height;
-    this.width = width;
-    this.top = top;
-    this.left = left;
+  constructor({ element, viewport, screen, scene }) {
+    this.element = element;
+    this.viewport = viewport;
     this.screen = screen;
+    this.scene = scene;
 
     this.geometry = new THREE.PlaneGeometry(1, 1);
     this.material = new THREE.ShaderMaterial({
@@ -40,15 +38,10 @@ export default class Media {
 
   createMesh() {
     const img = new Image();
-    img.src = IMAGE_PATH + this.src;
-    texture;
+    img.src = IMAGE_PATH + this.element.src;
 
     // Wait for image to load
     img.onload = () => {
-      program.uniforms.uImageSizes.value = [
-        img.naturalWidth,
-        img.naturalHeight,
-      ];
       let texture = new THREE.Texture(img);
       texture.generateMipmaps = false;
       texture.minFilter = THREE.LinearFilter;
@@ -57,28 +50,28 @@ export default class Media {
     };
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+    this.scene.add(this.mesh);
   }
 
   // Handle scale and position of the plane
   createBounds() {
-    this.mesh.scale.set(this.width, this.height);
+    this.mesh.scale.set(1, 1, 1);
 
-    this.mesh.position.y = -this.top + this.screen.height / 2 - this.height / 2;
-    this.mesh.position.x = this.left - this.screen.width / 2 + this.width / 2;
+    this.mesh.position.set(0, 0, 0);
+  }
+
+  loop() {
+    this.createBounds();
   }
 
   resize(s) {
     if (s) {
-      const { sizes, viewport } = s;
+      const { screen, viewport } = s;
       // if (height) this.height = height;
-      if (sizes) this.sizes = sizes;
+      if (screen) this.screen = screen;
       if (viewport) {
         this.viewport = viewport;
-
-        this.plane.program.uniforms.uViewportSizes.value = [
-          this.viewport.width,
-          this.viewport.height,
-        ];
       }
     }
 
