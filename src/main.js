@@ -33,10 +33,16 @@ class App {
       ease: 0.075,
     }
 
+    this.preloader()
+
     this.resize()
     this.createImg()
     this.loop()
     this.initEvents()
+  }
+
+  preloader() {
+    console.log(window.ASSETS)
   }
 
   // Create webGL planes
@@ -51,6 +57,12 @@ class App {
       })
 
       return img
+    })
+
+    this.imgList.forEach((el) => {
+      const { img } = el
+
+      console.log(img)
     })
   }
 

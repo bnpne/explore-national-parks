@@ -14,12 +14,15 @@ html {
   top: 0;
   user-select: none;
   width: 100%;
+  font-family: "Helvetica Neue";
 }
 
 body {
   height: 100%;
   width: 100%;
   margin: 0;
+  color: #d3cab1;
+  background: #151515;
 }
 
 .main {
@@ -32,29 +35,13 @@ body {
   z-index: 1;
 }
 
-.gallery {
-  margin: 0;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-areas: ". . . .";
-  position: relative;
-}
-
-.gallery__el {
-  position: relative;
-}
-
-.gallery__el--plane {
+.s {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  height: 40rem;
-  width: 30rem;
-}
-
-.display {
-  will-change: transform;
+  top: 0;
+  left: 0;
+  transform: rotate(-90deg);
+  font-size: 22rem;
+  line-height: 28rem;
+  font-weight: 700;
+  letter-spacing: -5%;
 }
