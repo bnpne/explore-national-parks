@@ -11,18 +11,23 @@ export function getImageDimensions(image, canvasWidth) {
   This grid is based on a 12 column grid. To really make this random, I need to find the width of each column plus the position.
   I can then use the width and position to place each image when given a column span
 **/
-
-export function getColumnPos(screen, numOfColumns, el) {
-  const actualStart = el.col - 1 // 0 set the start
-  const colWidth = screen.width / numOfColumns // Get Column width based on how many columns on viewport
-  const start = colWidth * actualStart // Get the starting position based on colStart
+export function getColumnPos(screen, numOfColumns, el, padding) {
+  let p = 0
+  if (padding) {
+    p = padding
+  }
+  const colWidth = (screen.width - p * 2) / numOfColumns // Get Column width based on how many columns on viewport
+  const start = colWidth * el.col + p // Get the starting position based on colStart
 
   return { start }
 }
 
-export function getRowPos(rowHeight, el) {
-  const actualStart = el.row - 1 // 0 set the start
-  const start = rowHeight * actualStart // Get the starting position based on colStart]
+export function getRowPos(rowHeight, el, padding) {
+  let p = 0
+  if (padding) {
+    p = padding
+  }
+  const start = (rowHeight + p) * el.row // Get the starting position based on colStart]
 
   return { start }
 }

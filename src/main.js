@@ -35,7 +35,6 @@ class App {
     }
 
     this.tl = gsap.timeline({ paused: true })
-
     this.loaded = 0
 
     this.resize()
@@ -45,13 +44,13 @@ class App {
   }
 
   createMedia() {
-    this.mediaList = IMG_COORD.map((el, i) => {
+    this.mediaList = []
+
+    IMG_COORD.map((el, i) => {
       const m = new Image()
       m.src = el.img
-      let a = null
       m.onload = () => {
-        console.log("loaded")
-        a = new Media({
+        const media = new Media({
           image: m,
           element: el,
           viewport: this.viewport,
@@ -61,78 +60,10 @@ class App {
         })
 
         this.loaded += 1
-        return a
+
+        this.mediaList.push(media)
       }
     })
-
-    console.log(this.mediaList)
-  }
-
-  createDom() {
-    // DOM.forEach((el, i) => {
-    //   if (i !== 0) {
-    //     const t = document.createElement("li")
-    //     this.list.appendChild(t)
-    //     t.classList.add("fe")
-    //   }
-    //
-    //   // Add text
-    //   if (el.text) {
-    //     // Create List
-    //     const t = document.createElement("li")
-    //     t.classList.add("fe")
-    //
-    //     // Create text el
-    //     const text = document.createElement("p")
-    //     text.innerHTML = el.text
-    //
-    //     t.appendChild(text)
-    //     this.list.appendChild(t)
-    //
-    //     // this.tl.fromTo(
-    //     //   t,
-    //     //   { y: "200%" },
-    //     //   { y: "0%", duration: 0.4, ease: "circ.easeIn" },
-    //     //   "<5%"
-    //     // )
-    //   }
-    //
-    //   // Add Media
-    //   if (el.imgs.length > 0) {
-    //     el.imgs.forEach((img, i) => {
-    //       // Create List item
-    //       const t = document.createElement("li")
-    //       t.classList.add("fe")
-    //       // Add item to list on dom
-    //       this.list.appendChild(t)
-    //
-    //       // this.tl.fromTo(
-    //       //   t,
-    //       //   { y: "200%" },
-    //       //   { y: "0%", duration: 0.4, ease: "circ.easeIn" },
-    //       //   "<5%"
-    //       // )
-    //
-    //       // Now we can get Coord using getBoundingClientRect
-    //       const m = new Image()
-    //       m.src = img
-    //       m.onload = () => {
-    //         const media = new Media({
-    //           image: m,
-    //           element: t,
-    //           viewport: this.viewport,
-    //           screen: this.screen,
-    //           scene: this.scene,
-    //           index: i,
-    //         })
-    //
-    //         this.mediaList.push(media)
-    //
-    //         this.loaded += 1
-    //       }
-    //     })
-    //   }
-    // })
   }
 
   // listen for the resize
@@ -163,15 +94,15 @@ class App {
   }
 
   loop() {
-    if (this.loaded == 19) {
+    if (this.loaded == IMG_COORD.length) {
       document.documentElement.classList.remove("loading")
       document.documentElement.classList.add("loaded")
-
-      // this.tl.play()
     }
 
     if (this.mediaList) {
-      this.mediaList.forEach((el) => el.loop())
+      this.mediaList.forEach((el) => {
+        el.loop()
+      })
     }
 
     // Start renderer

@@ -1,3 +1,4 @@
+import gsap from "gsap"
 import * as THREE from "three"
 import {
   getColumnPos,
@@ -15,6 +16,8 @@ export default class Media {
     this.screen = screen
     this.scene = scene
     this.index = index
+
+    this.tl = gsap.timeline({ paused: true })
 
     this.geometry = new THREE.PlaneGeometry(1, 1)
     this.material = new THREE.ShaderMaterial({
@@ -52,6 +55,8 @@ export default class Media {
     this.createMesh()
     this.createBounds()
     this.resize()
+
+    this.createTween()
   }
 
   createMesh() {
@@ -81,30 +86,24 @@ export default class Media {
     this.material.uniforms.planeSize.value = [defaultWidth, defaultHeight]
 
     ///////////////// USE THIS WHEN CREATING GRID AND USING WEBGL COORDS /////////////////
+    ///////////////// NOTE: This will put the image in the lower right of the column
+    ///////////////// using RIGHT and BOTTOM absolute positions
 
-    const { start: colPos } = getColumnPos(this.screen, 6, this.element)
-    const { start: rowPos } = getRowPos(400, this.element)
+    const { start: colPos } = getColumnPos(this.screen, 6, this.element, 30)
+    const { start: rowPos } = getRowPos(400, this.element, 16)
 
-    ///////////////// USE THIS WHEN YOU ARE GETTING BOUNDS FROM THE DOM //////////////////
+    const x = getPositionX(this.mesh.scale, this.viewport, this.screen, colPos)
+    const y = getPositionY(this.mesh.scale, this.viewport, this.screen, rowPos)
 
-    // const bounds = this.element.getBoundingClientRect()
-    //
-    // const x = getPositionX(
-    //   this.mesh.scale,
-    //   this.viewport,
-    //   this.screen,
-    //   bounds.right
-    // )
-    // const y = getPositionY(
-    //   this.mesh.scale,
-    //   this.viewport,
-    //   this.screen,
-    //   bounds.bottom
-    // )
-    //
-    // this.mesh.position.set(x, y, 0)
+    this.mesh.position.set(x, y, 0)
+  }
 
-    this.mesh.position.set(0, 0, 0)
+  createTween() {
+    this.tl.to(this.mesh.position, { y: 0, duration: 1 }, "start")
+  }
+
+  trigger() {
+    this.tl.play()
   }
 
   loop() {
