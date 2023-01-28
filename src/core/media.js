@@ -7,23 +7,20 @@ import {
   getRowPos,
 } from "../utils/format"
 
-import { IMG_COORD } from "../lib/store"
-
 export default class Media {
-  constructor({ element, viewport, screen, scene, index }) {
+  constructor({ image, element, viewport, screen, scene, index }) {
+    this.image = image
     this.element = element
     this.viewport = viewport
     this.screen = screen
     this.scene = scene
     this.index = index
 
-    this.coord = IMG_COORD
-
     this.geometry = new THREE.PlaneGeometry(1, 1)
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         u_image: { value: 0 },
-        planeSize: { value: [1.1] },
+        planeSize: { value: [1, 1] },
         imgSize: { value: [1, 1] },
       },
       fragmentShader: `
@@ -58,20 +55,15 @@ export default class Media {
   }
 
   createMesh() {
-    this.loader = new THREE.ImageLoader()
-    this.loader.load(this.element, function (image) {})
-
-    this.img.onload = () => {
-      let texture = new THREE.Texture(this.img)
-      texture.generateMipmaps = false
-      texture.minFilter = THREE.LinearFilter
-      texture.needsUpdate = true
-      this.material.uniforms.u_image.value = texture
-      this.material.uniforms.imgSize.value = [
-        this.img.naturalWidth,
-        this.img.naturalHeight,
-      ]
-    }
+    let texture = new THREE.Texture(this.image)
+    texture.generateMipmaps = false
+    texture.minFilter = THREE.LinearFilter
+    texture.needsUpdate = true
+    this.material.uniforms.u_image.value = texture
+    this.material.uniforms.imgSize.value = [
+      this.image.naturalWidth,
+      this.image.naturalHeight,
+    ]
 
     this.mesh = new THREE.Mesh(this.geometry, this.material)
 
@@ -85,35 +77,34 @@ export default class Media {
       this.viewport.width
     )
 
-    // Coordinates on the grid for each plane
     this.mesh.scale.set(defaultWidth, defaultHeight, 1)
-
     this.material.uniforms.planeSize.value = [defaultWidth, defaultHeight]
 
-    const { start: colStart } = getColumnPos(
-      this.screen,
-      12,
-      this.coord[this.index]
-    )
-    const { start: rowStart } = getRowPos(
-      this.screen,
-      12,
-      this.coord[this.index]
-    )
+    ///////////////// USE THIS WHEN CREATING GRID AND USING WEBGL COORDS /////////////////
 
-    const x = getPositionX(
-      this.mesh.scale,
-      this.viewport,
-      this.screen,
-      colStart
-    )
-    const y = getPositionY(
-      this.mesh.scale,
-      this.viewport,
-      this.screen,
-      rowStart
-    )
-    this.mesh.position.set(x, y, 0)
+    const { start: colPos } = getColumnPos(this.screen, 6, this.element)
+    const { start: rowPos } = getRowPos(400, this.element)
+
+    ///////////////// USE THIS WHEN YOU ARE GETTING BOUNDS FROM THE DOM //////////////////
+
+    // const bounds = this.element.getBoundingClientRect()
+    //
+    // const x = getPositionX(
+    //   this.mesh.scale,
+    //   this.viewport,
+    //   this.screen,
+    //   bounds.right
+    // )
+    // const y = getPositionY(
+    //   this.mesh.scale,
+    //   this.viewport,
+    //   this.screen,
+    //   bounds.bottom
+    // )
+    //
+    // this.mesh.position.set(x, y, 0)
+
+    this.mesh.position.set(0, 0, 0)
   }
 
   loop() {

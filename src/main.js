@@ -1,7 +1,8 @@
 import * as THREE from "three"
 import Media from "./core/media"
-import { IMG_ARRAY } from "./lib/store"
+import gsap from "gsap"
 
+import { IMG_COORD } from "./lib/store"
 import "./style.css"
 
 class App {
@@ -33,37 +34,105 @@ class App {
       ease: 0.075,
     }
 
-    this.preloader()
+    this.tl = gsap.timeline({ paused: true })
+
+    this.loaded = 0
 
     this.resize()
-    this.createImg()
+    this.createMedia()
     this.loop()
     this.initEvents()
   }
 
-  preloader() {
-    console.log(window.ASSETS)
+  createMedia() {
+    this.mediaList = IMG_COORD.map((el, i) => {
+      const m = new Image()
+      m.src = el.img
+      let a = null
+      m.onload = () => {
+        console.log("loaded")
+        a = new Media({
+          image: m,
+          element: el,
+          viewport: this.viewport,
+          screen: this.screen,
+          scene: this.scene,
+          index: i,
+        })
+
+        this.loaded += 1
+        return a
+      }
+    })
+
+    console.log(this.mediaList)
   }
 
-  // Create webGL planes
-  createImg() {
-    this.imgList = IMG_ARRAY.map((el, i) => {
-      const img = new Media({
-        element: el,
-        viewport: this.viewport,
-        screen: this.screen,
-        scene: this.scene,
-        index: i,
-      })
-
-      return img
-    })
-
-    this.imgList.forEach((el) => {
-      const { img } = el
-
-      console.log(img)
-    })
+  createDom() {
+    // DOM.forEach((el, i) => {
+    //   if (i !== 0) {
+    //     const t = document.createElement("li")
+    //     this.list.appendChild(t)
+    //     t.classList.add("fe")
+    //   }
+    //
+    //   // Add text
+    //   if (el.text) {
+    //     // Create List
+    //     const t = document.createElement("li")
+    //     t.classList.add("fe")
+    //
+    //     // Create text el
+    //     const text = document.createElement("p")
+    //     text.innerHTML = el.text
+    //
+    //     t.appendChild(text)
+    //     this.list.appendChild(t)
+    //
+    //     // this.tl.fromTo(
+    //     //   t,
+    //     //   { y: "200%" },
+    //     //   { y: "0%", duration: 0.4, ease: "circ.easeIn" },
+    //     //   "<5%"
+    //     // )
+    //   }
+    //
+    //   // Add Media
+    //   if (el.imgs.length > 0) {
+    //     el.imgs.forEach((img, i) => {
+    //       // Create List item
+    //       const t = document.createElement("li")
+    //       t.classList.add("fe")
+    //       // Add item to list on dom
+    //       this.list.appendChild(t)
+    //
+    //       // this.tl.fromTo(
+    //       //   t,
+    //       //   { y: "200%" },
+    //       //   { y: "0%", duration: 0.4, ease: "circ.easeIn" },
+    //       //   "<5%"
+    //       // )
+    //
+    //       // Now we can get Coord using getBoundingClientRect
+    //       const m = new Image()
+    //       m.src = img
+    //       m.onload = () => {
+    //         const media = new Media({
+    //           image: m,
+    //           element: t,
+    //           viewport: this.viewport,
+    //           screen: this.screen,
+    //           scene: this.scene,
+    //           index: i,
+    //         })
+    //
+    //         this.mediaList.push(media)
+    //
+    //         this.loaded += 1
+    //       }
+    //     })
+    //   }
+    // })
   }
 
   // listen for the resize
@@ -86,16 +155,23 @@ class App {
       width: width,
     }
 
-    if (this.imgList) {
-      this.imgList.forEach((el) => {
+    if (this.mediaList) {
+      this.mediaList.forEach((el) => {
         el.resize({ screen: this.screen, viewport: this.viewport })
       })
     }
   }
 
   loop() {
-    if (this.imgList) {
-      this.imgList.forEach((el) => el.loop())
+    if (this.loaded == 19) {
+      document.documentElement.classList.remove("loading")
+      document.documentElement.classList.add("loaded")
+
+      // this.tl.play()
+    }
+
+    if (this.mediaList) {
+      this.mediaList.forEach((el) => el.loop())
     }
 
     // Start renderer

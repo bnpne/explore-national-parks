@@ -1,8 +1,5 @@
 * {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
   overflow: hidden;
 }
 
@@ -15,6 +12,7 @@ html {
   user-select: none;
   width: 100%;
   font-family: "Helvetica Neue";
+  font-weight: 700;
 }
 
 body {
@@ -25,13 +23,35 @@ body {
   background: #151515;
 }
 
-.main {
+ul {
+  list-style-type: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.1rem;
+  letter-spacing: -2%;
+}
+
+#main {
   position: absolute;
   height: 100%;
   overflow: hidden;
   top: 0;
   left: 0;
   width: 100%;
+  z-index: 2;
+}
+
+#r {
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 1;
 }
 
@@ -44,4 +64,42 @@ body {
   line-height: 28rem;
   font-weight: 700;
   letter-spacing: -5%;
+}
+
+.c {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.w {
+  position: relative;
+  margin: 1.6rem;
+}
+
+.f {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.fe {
+  will-change: transform;
+  width: calc(100% / 6);
+  height: 40rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.pl {
+  will-change: transform;
+  width: 100%;
+  height: 100%;
+  background: #151515;
+  position: absolute;
+  z-index: 9999;
+  top: 0;
+  left: 0;
 }

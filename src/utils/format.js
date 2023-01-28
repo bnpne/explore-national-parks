@@ -20,9 +20,8 @@ export function getColumnPos(screen, numOfColumns, el) {
   return { start }
 }
 
-export function getRowPos(screen, numOfRows, el) {
+export function getRowPos(rowHeight, el) {
   const actualStart = el.row - 1 // 0 set the start
-  const rowHeight = screen.height / numOfRows // Get Column width based on how many columns on viewport
   const start = rowHeight * actualStart // Get the starting position based on colStart]
 
   return { start }
@@ -30,7 +29,7 @@ export function getRowPos(screen, numOfRows, el) {
 
 export function getPositionX(planeScale, viewport, screen, x) {
   return (
-    -(viewport.width / 2) +
+    -(viewport.width / 2) -
     planeScale.x / 2 +
     (x / screen.width) * viewport.width
   )
@@ -38,7 +37,7 @@ export function getPositionX(planeScale, viewport, screen, x) {
 
 export function getPositionY(planeScale, viewport, screen, y) {
   return (
-    viewport.height / 2 -
+    viewport.height / 2 +
     planeScale.y / 2 -
     (y / screen.height) * viewport.height
   )
