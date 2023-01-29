@@ -73,34 +73,52 @@ export default class Media {
 
   // Handle scale and position of the plane
   createBounds() {
-    const { width: defaultWidth, height: defaultHeight } = getImageDimensions(
-      this.img,
-      this.viewport.width
-    )
-
-    this.mesh.scale.set(defaultWidth, defaultHeight, 1)
-    this.material.uniforms.planeSize.value = [defaultWidth, defaultHeight]
-
     ///////////////// USE THIS WHEN CREATING GRID AND USING WEBGL COORDS /////////////////
     ///////////////// NOTE: This will put the image in the lower right of the column
     ///////////////// using RIGHT and BOTTOM absolute positions
 
-    const { start: colPos } = getColumnPos(this.screen, 6, this.element, 30)
-    const { start: rowPos } = getRowPos(400, this.element, 16)
+    this.scale()
+    this.posX()
+    this.posY()
 
+    this.material.uniforms.planeSize.value = [
+      this.defaultWidth,
+      this.defaultHeight,
+    ]
+  }
+
+  scale() {
+    const { width, height } = getImageDimensions(this.img, this.viewport.width)
+
+    this.defaultWidth = width
+    this.defaultHeight = height
+
+    this.mesh.scale.set(this.defaultWidth, this.defaultHeight, 1)
+  }
+
+  posX() {
+    const { start: colPos } = getColumnPos(this.screen, 6, this.element, 30)
     const x = getPositionX(this.mesh.scale, this.viewport, this.screen, colPos)
+
+    this.mesh.position.x = x
+  }
+
+  posY() {
+    const { start: rowPos } = getRowPos(400, this.element, 16)
     const y = getPositionY(this.mesh.scale, this.viewport, this.screen, rowPos)
 
-    this.mesh.position.set(x, y, 0)
+    this.mesh.position.y = y
   }
 
   trigger() {
     console.log("trigger")
-    // gsap.to(this.mesh.position, { y: 0, duration: 1 })
+    gsap.to(this.mesh.position, { y: 0, duration: 1 })
   }
 
   loop() {
-    this.createBounds()
+    this.scale()
+    this.posX()
+    this.posY()
   }
 
   resize(s) {
