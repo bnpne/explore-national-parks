@@ -17,8 +17,6 @@ export default class Media {
     this.scene = scene
     this.index = index
 
-    this.tl = gsap.timeline({ paused: true })
-
     this.geometry = new THREE.PlaneGeometry(1, 1)
     this.material = new THREE.ShaderMaterial({
       uniforms: {
@@ -55,8 +53,6 @@ export default class Media {
     this.createMesh()
     this.createBounds()
     this.resize()
-
-    this.createTween()
   }
 
   createMesh() {
@@ -98,12 +94,9 @@ export default class Media {
     this.mesh.position.set(x, y, 0)
   }
 
-  createTween() {
-    this.tl.to(this.mesh.position, { y: 0, duration: 1 }, "start")
-  }
-
   trigger() {
-    this.tl.play()
+    console.log("trigger")
+    // gsap.to(this.mesh.position, { y: 0, duration: 1 })
   }
 
   loop() {

@@ -2,7 +2,7 @@ import * as THREE from "three"
 import Media from "./core/media"
 import gsap from "gsap"
 
-import { IMG_COORD } from "./lib/store"
+import { IMG_ARRAY, IMG_COORD } from "./lib/store"
 import "./style.css"
 
 class App {
@@ -34,8 +34,7 @@ class App {
       ease: 0.075,
     }
 
-    this.tl = gsap.timeline({ paused: true })
-    this.loaded = 0
+    this.loadedImgs = 0
 
     this.resize()
     this.createMedia()
@@ -59,11 +58,21 @@ class App {
           index: i,
         })
 
-        this.loaded += 1
+        this.loadedImgs += 1
+        if (this.loadedImgs == IMG_COORD.length) {
+          this.loaded()
+        }
 
         this.mediaList.push(media)
       }
     })
+  }
+
+  loaded() {
+    document.documentElement.classList.remove("loading")
+    document.documentElement.classList.add("loaded")
+
+    this.mediaList.forEach((el) => el.trigger())
   }
 
   // listen for the resize
@@ -94,11 +103,6 @@ class App {
   }
 
   loop() {
-    if (this.loaded == IMG_COORD.length) {
-      document.documentElement.classList.remove("loading")
-      document.documentElement.classList.add("loaded")
-    }
-
     if (this.mediaList) {
       this.mediaList.forEach((el) => {
         el.loop()
