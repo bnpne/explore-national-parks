@@ -71,8 +71,6 @@ class App {
   loaded() {
     document.documentElement.classList.remove("loading")
     document.documentElement.classList.add("loaded")
-
-    this.mediaList.forEach((el) => el.trigger())
   }
 
   // listen for the resize

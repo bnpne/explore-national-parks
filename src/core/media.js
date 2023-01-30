@@ -110,11 +110,6 @@ export default class Media {
     this.mesh.position.y = y
   }
 
-  trigger() {
-    console.log("trigger")
-    gsap.to(this.mesh.position, { y: 0, duration: 1 })
-  }
-
   loop() {
     this.scale()
     this.posX()
