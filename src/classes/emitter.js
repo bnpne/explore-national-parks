@@ -4,36 +4,35 @@ export default class Emitter {
   constructor() {
     this.events = {}
   }
-
-  _getEventListByName(eventName) {
-    if (typeof this.events[eventName] === "undefined") {
-      this.events[eventName] = new Set()
+  on(event, listener) {
+    if (!(event in this.events)) {
+      this.events[event] = []
     }
-    return this.events[eventName]
+    this.events[event].push(listener)
+    return () => this.removeListener(event, listener)
   }
-
-  on(eventName, fn) {
-    this._getEventListByName(eventName).add(fn)
-  }
-
-  once(eventName, fn) {
-    const self = this
-    const onceFn = function (...args) {
-      self.removeListener(eventName, onceFn)
-      fn.apply(self, args)
+  removeListener(event, listener) {
+    if (!(event in this.events)) {
+      return
     }
-    this.on(eventName, onceFn)
+    const idx = this.events[event].indexOf(listener)
+    if (idx > -1) {
+      this.events[event].splice(idx, 1)
+    }
+    if (this.events[event].length === 0) {
+      delete this.events[event]
+    }
   }
-
-  emit(eventName, ...args) {
-    this._getEventListByName(eventName).forEach(
-      function (fn) {
-        fn.apply(this, args)
-      }.bind(this)
-    )
+  emit(event, ...args) {
+    if (!(event in this.events)) {
+      return
+    }
+    this.events[event].forEach((listener) => listener(...args))
   }
-
-  removeListener(eventName, fn) {
-    this._getEventListByName(eventName).delete(fn)
+  once(event, listener) {
+    const remove = this.on(event, (...args) => {
+      remove()
+      listener(...args)
+    })
   }
 }
