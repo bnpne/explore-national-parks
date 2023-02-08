@@ -3,7 +3,7 @@ import { CustomEase } from "gsap/CustomEase"
 import Canvas from "./components/canvas"
 import Preloader from "./components/preloader"
 import Home from "./pages/home"
-import { STATE } from "./lib"
+import { getData, STATE } from "./lib"
 
 import "./styles/index.css"
 
@@ -14,6 +14,7 @@ class App {
     // Init state
     this.initState()
 
+    this.getData()
     this.createCanvas()
     this.createPages()
     this.preload()
@@ -90,6 +91,10 @@ class App {
     STATE.removeSelectedHistory = function () {
       this.selectedHistory = null
     }
+  }
+
+  getData() {
+    getData().then((data) => console.log(data))
   }
 
   createCanvas() {

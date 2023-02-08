@@ -6,6 +6,7 @@ import img5 from "../../assets/gantas-vaiciulenas-cJjjWbXwUBs-unsplash.jpg"
 import img6 from "../../assets/gantas-vaiciulenas-nKMbaKwUHRY-unsplash.jpg"
 import img7 from "../../assets/gantas-vaiciulenas-s5tmgOi1ZEY-unsplash.jpg"
 import img8 from "../../assets/gantas-vaiciulenas-wZWZGkIY_Nc-unsplash.jpg"
+
 import State from "./state"
 
 export const IMG_COORD = [
@@ -30,3 +31,19 @@ export const IMG_COORD = [
 ]
 
 export const STATE = new State()
+
+export function getData() {
+  let PROJECT_ID = "r21elry8"
+  let DATASET = "production"
+  let QUERY = encodeURIComponent('*[_type == "gallery"]{title, image, _id}')
+  let URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`
+
+  return fetch(URL)
+    .then((res) => {
+      return res.json()
+    })
+    .then((data) => {
+      return data.result
+    })
+    .catch((err) => console.error(err))
+}
