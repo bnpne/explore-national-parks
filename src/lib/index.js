@@ -6,6 +6,7 @@ import img5 from "../../assets/gantas-vaiciulenas-cJjjWbXwUBs-unsplash.jpg"
 import img6 from "../../assets/gantas-vaiciulenas-nKMbaKwUHRY-unsplash.jpg"
 import img7 from "../../assets/gantas-vaiciulenas-s5tmgOi1ZEY-unsplash.jpg"
 import img8 from "../../assets/gantas-vaiciulenas-wZWZGkIY_Nc-unsplash.jpg"
+import State from "./state"
 
 export const IMG_COORD = [
   { img: img1, col: 1, row: 1 },
@@ -16,7 +17,6 @@ export const IMG_COORD = [
   { img: img6, col: 4, row: 2 },
   { img: img7, col: 6, row: 2 },
   { img: img8, col: 2, row: 3 },
-  { img: img1, col: 2, row: 3 },
   { img: img2, col: 3, row: 3 },
   { img: img3, col: 6, row: 3 },
   { img: img4, col: 1, row: 4 },
@@ -29,18 +29,4 @@ export const IMG_COORD = [
   { img: img3, col: 6, row: 5 },
 ]
 
-export const DOM = [
-  { text: "SW_001", imgs: [img1, img2, img3, img4] },
-  { text: "SW_002", imgs: [img5] },
-  { text: "SW_003", imgs: [img6, img7, img8, img4, img6] },
-  { text: "SW_004", imgs: [img1, img2] },
-  { text: "SW_005", imgs: [img3, img4, img7] },
-  { text: "SW_006", imgs: [img1, img2, img3, img4] },
-]
-
-export const IMG_ARRAY = () => {
-  let t = new Array()
-  DOM.forEach((el) => (t = t.concat(el.imgs)))
-
-  return t
-}
+export const STATE = new State()

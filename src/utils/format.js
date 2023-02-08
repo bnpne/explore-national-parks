@@ -1,9 +1,9 @@
 const WIDTH_RATIO = 0.08
 
-export function getImageDimensions(image, canvasWidth) {
+export function getImageDimensions(widthScale, widthRatio, canvasWidth) {
   return {
-    width: canvasWidth * WIDTH_RATIO,
-    height: (canvasWidth * WIDTH_RATIO) / (300 / 350),
+    width: canvasWidth * widthScale,
+    height: (canvasWidth * widthScale) / widthRatio, //(300 / 350)
   }
 }
 
@@ -22,12 +22,17 @@ export function getColumnPos(screen, numOfColumns, el, padding) {
   return { start }
 }
 
-export function getRowPos(rowHeight, el, padding) {
+export function getRowPos(screen, rowHeight, el, padding) {
   let p = 0
   if (padding) {
     p = padding
   }
-  const start = (rowHeight + p) * el.row // Get the starting position based on colStart]
+
+  // Bottom is the height relative to the screen size
+  // Row height is always based on 1920px width
+  const ratio = rowHeight / 1920
+  const height = ratio * (screen.width - p * 2)
+  const start = height * el.row + p // Get the starting position based on colStart]
 
   return { start }
 }

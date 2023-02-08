@@ -1,4 +1,4 @@
-import Emitter from "../classes/emitter"
+import Emitter from "./emitter"
 
 export default class Page extends Emitter {
   constructor() {

@@ -1,4 +1,4 @@
-import Page from '../components/page'
+import Page from "../classes/page"
 
 export default class Home extends Page {
   constructor() {
@@ -17,5 +17,9 @@ export default class Home extends Page {
 
   create() {
     super.create()
+
+    // const s = document.querySelector(
+    // "#j")
+    // console.log(s.getBoundingClientRect())
   }
 }

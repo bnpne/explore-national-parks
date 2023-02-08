@@ -1,46 +1,49 @@
-import gsap from "gsap"
 import * as THREE from "three"
-import {
-  getColumnPos,
-  getImageDimensions,
-  getPositionX,
-  getPositionY,
-  getRowPos,
-} from "../utils/format"
 
 export default class Media {
-  constructor({ image, element, viewport, screen, scene, index }) {
-    this.image = image
-    this.element = element
+  constructor() {}
+
+  // Initialize functiom
+  // creates mesh and material
+  // sets bounds
+  init({ tex, viewport, screen, scene, index, element }) {
+    this.tex = tex
     this.viewport = viewport
     this.screen = screen
     this.scene = scene
     this.index = index
+    this.element = element
 
     this.geometry = new THREE.PlaneGeometry(1, 1)
+
+    // Basic image material
     this.material = new THREE.ShaderMaterial({
       uniforms: {
-        u_image: { value: 0 },
-        planeSize: { value: [1, 1] },
+        tex: { value: 0 },
+        planeDim: { value: [1, 1] },
         imgSize: { value: [1, 1] },
+        alpha: { value: 1 },
       },
       fragmentShader: `
+              uniform sampler2D tex;
+              uniform float alpha;
+              uniform vec2 imgDim;
+              uniform vec2 planeDim;
               varying vec2 vUv;
-              uniform sampler2D u_image;
-              uniform vec2 planeSize;
-              uniform vec2 imgSize;
-              void main(){
-              vec2 ratio = vec2(
-                min((planeSize.x / planeSize.y) / (imgSize.x / imgSize.y), 1.0),
-                min((planeSize.y / planeSize.x) / (imgSize.y / imgSize.x), 1.0)
-               );
 
-                vec2 uv = vec2(
-                  vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
-                  vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
-                );
-                  vec4 img = texture2D(u_image,uv);
-                  gl_FragColor = img;
+              void main() {
+                  vec2 ratio = vec2(
+                    min((planeDim.x / planeDim.y) / (imgDim.x / imgDim.y), 1.0),
+                    min((planeDim.y / planeDim.x) / (imgDim.y / imgDim.x), 1.0)
+                  );
+
+                  vec2 uv = vec2(
+                    vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+                    vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+                  );
+
+                  gl_FragColor.rgb = texture2D(tex, uv).rgb;
+                  gl_FragColor.a = alpha;
               }`,
       vertexShader: `
               varying vec2 vUv;
@@ -56,22 +59,19 @@ export default class Media {
   }
 
   createMesh() {
-    let texture = new THREE.Texture(this.image)
-    texture.generateMipmaps = false
-    texture.minFilter = THREE.LinearFilter
-    texture.needsUpdate = true
-    this.material.uniforms.u_image.value = texture
+    this.material.transparent = true
+    this.material.uniforms.tex.value = this.tex
     this.material.uniforms.imgSize.value = [
-      this.image.naturalWidth,
-      this.image.naturalHeight,
+      this.tex.source.data.naturalWidth,
+      this.tex.source.data.naturalHeight,
     ]
+    this.material.side = THREE.DoubleSide
 
     this.mesh = new THREE.Mesh(this.geometry, this.material)
 
     this.scene.add(this.mesh)
   }
 
-  // Handle scale and position of the plane
   createBounds() {
     ///////////////// USE THIS WHEN CREATING GRID AND USING WEBGL COORDS /////////////////
     ///////////////// NOTE: This will put the image in the lower right of the column
@@ -81,39 +81,28 @@ export default class Media {
     this.posX()
     this.posY()
 
-    this.material.uniforms.planeSize.value = [
+    this.material.uniforms.planeDim.value = [
       this.defaultWidth,
       this.defaultHeight,
     ]
   }
 
   scale() {
-    const { width, height } = getImageDimensions(this.img, this.viewport.width)
-
-    this.defaultWidth = width
-    this.defaultHeight = height
-
-    this.mesh.scale.set(this.defaultWidth, this.defaultHeight, 1)
+    this.mesh.scale.set(1, 1, 1)
   }
 
   posX() {
-    const { start: colPos } = getColumnPos(this.screen, 6, this.element, 30)
-    const x = getPositionX(this.mesh.scale, this.viewport, this.screen, colPos)
-
-    this.mesh.position.x = x
+    this.mesh.position.x = 0
   }
 
   posY() {
-    const { start: rowPos } = getRowPos(400, this.element, 16)
-    const y = getPositionY(this.mesh.scale, this.viewport, this.screen, rowPos)
-
-    this.mesh.position.y = y
+    this.mesh.position.y = 0
   }
 
   loop() {
-    this.scale()
-    this.posX()
-    this.posY()
+    // this.scale()
+    // this.posX()
+    // this.posY()
   }
 
   resize(s) {
