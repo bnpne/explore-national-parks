@@ -32,13 +32,28 @@ export const IMG_COORD = [
 
 export const STATE = new State()
 
-export function getData() {
-  let PROJECT_ID = "r21elry8"
-  let DATASET = "production"
-  let QUERY = encodeURIComponent('*[_type == "gallery"]{title, image, _id}')
-  let URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`
+const PROJECT_ID = "r21elry8"
+const DATASET = "production"
+const GALLERY_QUERY = encodeURIComponent(
+  '*[_type == "gallery"]{title, image, _id}'
+)
+const GALLERY_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${GALLERY_QUERY}`
+const SELECTED_QUERY = encodeURIComponent('*[_type == "selected"]')
+const SELECTED_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${SELECTED_QUERY}`
 
-  return fetch(URL)
+export function getGallery() {
+  return fetch(GALLERY_URL)
+    .then((res) => {
+      return res.json()
+    })
+    .then((data) => {
+      return data.result
+    })
+    .catch((err) => console.error(err))
+}
+
+export function getSelected() {
+  return fetch(SELECTED_URL)
     .then((res) => {
       return res.json()
     })

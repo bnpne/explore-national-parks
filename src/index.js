@@ -3,7 +3,7 @@ import { CustomEase } from "gsap/CustomEase"
 import Canvas from "./components/canvas"
 import Preloader from "./components/preloader"
 import Home from "./pages/home"
-import { getData, STATE } from "./lib"
+import { STATE } from "./lib"
 
 import "./styles/index.css"
 
@@ -14,7 +14,6 @@ class App {
     // Init state
     this.initState()
 
-    this.getData()
     this.createCanvas()
     this.createPages()
     this.preload()
@@ -33,7 +32,7 @@ class App {
     STATE.timeline = gsap.timeline({
       paused: true,
       defaults: {
-        duration: 0.5,
+        duration: 0.3,
         ease: "second",
       },
       autoRemoveChildren: true,
@@ -44,13 +43,14 @@ class App {
       paused: true,
       smoothChildTiming: true,
       defaults: {
-        duration: 0.5,
+        duration: 0.3,
         ease: "second",
       },
     })
     STATE.percent = 0
     STATE.selected = null
-    STATE.selectedHistory = null
+    STATE.selectedPos = null
+    STATE.selectedScale = null
     STATE.imgState = 0
     STATE.imgPos = []
 
@@ -82,19 +82,19 @@ class App {
     STATE.removeSelected = function () {
       this.selected = null
     }
-    STATE.addSelectedHistory = function (selected) {
-      this.selectedHistory = selected
+    STATE.addSelectedPos = function (selected) {
+      this.selectedPos = selected
+    }
+    STATE.addSelectedScale = function (selected) {
+      this.selectedScale = selected
     }
     STATE.removeSelected = function () {
       this.selected = null
     }
     STATE.removeSelectedHistory = function () {
-      this.selectedHistory = null
+      this.selectedPos = null
+      this.selectedScale = null
     }
-  }
-
-  getData() {
-    getData().then((data) => console.log(data))
   }
 
   createCanvas() {

@@ -11,6 +11,8 @@ import { STATE } from "../../lib/"
 export default class HomeMedia extends Media {
   constructor() {
     super()
+
+    this.transitioned = false
   }
 
   init({ tex, element, index, viewport, screen, scene }) {
@@ -33,55 +35,24 @@ export default class HomeMedia extends Media {
   }
 
   scale() {
-    if (STATE.imgState === 0) {
-      const n = 100 / 1920
-      const { width, height } = getImageDimensions(
-        n,
-        1 / 1,
-        this.viewport.width
-      )
+    const n = 300 / 1920
+    const { width, height } = getImageDimensions(
+      n,
+      300 / 350,
+      this.viewport.width
+    )
 
-      this.defaultWidth = width
-      this.defaultHeight = height
+    this.defaultWidth = width
+    this.defaultHeight = height
 
-      this.mesh.scale.set(this.defaultWidth, this.defaultHeight, 1)
-    } else if (STATE.imgState === 1) {
-      const n = 150 / 1920
-      const { width, height } = getImageDimensions(
-        n,
-        300 / 350,
-        this.viewport.width
-      )
-
-      this.defaultWidth = width
-      this.defaultHeight = height
-
-      // Don't set it because we need to transition
-      // this.mesh.scale.set(this.defaultWidth, this.defaultHeight, 1)
-      STATE.transition.to(
-        this.mesh.scale,
-        { x: this.defaultWidth, y: this.defaultHeight },
-        "start"
-      )
-    }
+    this.mesh.scale.set(this.defaultWidth, this.defaultHeight)
   }
 
   posX() {
-    if (STATE.imgState === 0) {
-      // 30 in px is padding + 100 in px for img width
-      const w = 100 * (this.index + 1)
-      const pos = 30 + w
-      this.x = getPositionX(this.mesh.scale, this.viewport, this.screen, pos)
+    const { start: colPos } = getColumnPos(this.screen, 6, this.element, 0)
+    this.x = getPositionX(this.mesh.scale, this.viewport, this.screen, colPos)
 
-      this.mesh.position.x = this.x
-    } else if (STATE.imgState === 1) {
-      const { start: colPos } = getColumnPos(this.screen, 6, this.element, 30)
-      this.x = getPositionX(this.mesh.scale, this.viewport, this.screen, colPos)
-
-      // Don't set it because we need to transition
-      // this.mesh.position.x = this.x
-      STATE.transition.to(this.mesh.position, { x: this.x }, "start")
-    }
+    this.mesh.position.x = this.x
   }
 
   posY() {
@@ -96,14 +67,22 @@ export default class HomeMedia extends Media {
 
       // Don't set it because we need to transition
       // this.mesh.position.y = this.y
-      STATE.transition.to(this.mesh.position, { y: this.y }, "start")
+      if (!this.transitioned) {
+        STATE.transition.to(this.mesh.position, { y: this.y }, "start")
+      } else {
+        this.mesh.position.y = this.y
+      }
     }
   }
 
   transition() {
-    // Set new position by calling Functions
+    if (this.transitioned) {
+      return
+    }
+
     this.scale()
     this.posX()
     this.posY()
+    this.transitioned = true
   }
 }

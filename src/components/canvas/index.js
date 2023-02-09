@@ -39,6 +39,7 @@ export default class Canvas {
       this.createHomeMedia()
     }
     this.url = url
+    this.resize()
   }
 
   createHomeMedia() {
@@ -70,7 +71,9 @@ export default class Canvas {
 
     this.intersectedObjects = this.intersect(this.mouse)
     if (this.intersectedObjects.length > 0 && this.intersectedObjects[0]) {
-      document.body.style.cursor = "pointer"
+      if (!STATE.selected) {
+        document.body.style.cursor = "pointer"
+      }
     } else {
       document.body.style.cursor = "default"
     }
@@ -95,7 +98,16 @@ export default class Canvas {
       this.mouse.y = -(e.clientY / this.screen.height) * 2 + 1
 
       if (STATE.selected) {
-        STATE.selected.mesh.position.set(STATE.selectedHistory)
+        STATE.selected.mesh.position.set(
+          STATE.selectedPos.x,
+          STATE.selectedPos.y,
+          0
+        )
+        STATE.selected.mesh.scale.set(
+          STATE.selectedScale.x,
+          STATE.selectedScale.y
+        )
+
         STATE.dispatch("removeSelected")
         STATE.dispatch("removeSelectedHistory")
       } else {
@@ -105,17 +117,29 @@ export default class Canvas {
             (el) => el.mesh === this.intersectedObjects[0].object
           )
 
+          const h = new THREE.Vector3(
+            a[0].mesh.position.x,
+            a[0].mesh.position.y
+          )
+          const s = new THREE.Vector2(a[0].mesh.scale.x, a[0].mesh.scale.y)
+          const m = new THREE.Vector2(
+            a[0].mesh.scale.x,
+            a[0].mesh.scale.y
+          ).multiplyScalar(1.5)
           STATE.dispatch("addSelected", [a[0]])
-          STATE.dispatch("addSelectedHistory", [a[0].mesh.position])
-          STATE.selected.mesh.position.set(0, 0, 1)
+          STATE.dispatch("addSelectedPos", [h])
+          STATE.dispatch("addSelectedScale", [s])
+          a[0].mesh.position.set(0, 0, 1)
+          a[0].mesh.scale.set(m)
         }
       }
     }
   }
 
   transition() {
-    // add a tween to go to new position and size
-    if (this.homeMediaList) this.homeMediaList.forEach((el) => el.transition())
+    if (this.homeMediaList) {
+      this.homeMediaList.forEach((el) => el.transition())
+    }
   }
 
   resize() {
