@@ -1,6 +1,7 @@
 import Emitter from "../classes/emitter"
 import * as THREE from "three"
-import { IMG_COORD, STATE } from "../lib/"
+import { getGallery, STATE } from "../lib/"
+import img1 from "../../assets/tyler-nix-d1E3WP-ANRo-unsplash.jpg"
 
 export default class Preloader extends Emitter {
   constructor() {
@@ -18,25 +19,35 @@ export default class Preloader extends Emitter {
     this.load()
   }
 
-  async load() {
-    const list = []
-    for (const el of IMG_COORD) {
-      await this.loadTexture(el).then((t) => {
-        this.percent.innerHTML = `${STATE.percent * 3}`
-        list.push(t)
-      })
-      if (STATE.percent === IMG_COORD.length - 1) {
-        STATE.dispatch("addTex", [list])
-        this.loaded()
+  load() {
+    getGallery().then(async (e) => {
+      const list = []
+      const gal = []
+      for (const el of e) {
+        // console.log(el.src)
+        gal.push(el)
+
+        // TEST
+        const test = new Image()
+        test.src = img1
+        await this.loadTexture(test).then((t) => {
+          this.percent.innerHTML = `${STATE.percent * 3}`
+          list.push(t)
+        })
+        if (STATE.percent === e.length - 1) {
+          STATE.dispatch("addGallery", [gal])
+          STATE.dispatch("addTex", [list])
+          this.loaded()
+        }
       }
-    }
+    })
   }
 
   loadTexture(el) {
     const l = new THREE.TextureLoader()
     return new Promise((resolve, reject) => {
       l.load(
-        el.img,
+        el.src,
         function (tex) {
           STATE.dispatch("addPercent", [1])
 

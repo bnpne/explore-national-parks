@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { IMG_COORD, STATE } from "../../lib"
 import HomeMedia from "./homeMedia"
-import gsap from "gsap"
+import normalizeWheel from "normalize-wheel"
 
 export default class Canvas {
   constructor({ el, url }) {
@@ -48,11 +48,12 @@ export default class Canvas {
       const homeMedia = new HomeMedia()
       homeMedia.init({
         tex: tex,
-        element: IMG_COORD[i],
         index: i,
         viewport: this.viewport,
         scene: this.scene,
         screen: this.screen,
+        col: IMG_COORD[i].col,
+        row: IMG_COORD[i].row,
       })
 
       return homeMedia
@@ -80,20 +81,7 @@ export default class Canvas {
   }
 
   click(e) {
-    if (STATE.imgState === 0) {
-      this.mouse.x = (e.clientX / this.screen.width) * 2 - 1
-      this.mouse.y = -(e.clientY / this.screen.height) * 2 + 1
-
-      this.intersectedObjects = this.intersect(this.mouse)
-      if (this.intersectedObjects.length > 0 && this.intersectedObjects[0]) {
-        // Go to next state
-        STATE.dispatch("addImgState", [1])
-        // Update the coor and sizes
-        this.transition()
-        // Play transition
-        STATE.transition.play()
-      }
-    } else if (STATE.imgState === 1) {
+    if (STATE.imgState === 1) {
       this.mouse.x = (e.clientX / this.screen.width) * 2 - 1
       this.mouse.y = -(e.clientY / this.screen.height) * 2 + 1
 
@@ -126,14 +114,46 @@ export default class Canvas {
             a[0].mesh.scale.x,
             a[0].mesh.scale.y
           ).multiplyScalar(1.5)
+
           STATE.dispatch("addSelected", [a[0]])
           STATE.dispatch("addSelectedPos", [h])
           STATE.dispatch("addSelectedScale", [s])
+
           a[0].mesh.position.set(0, 0, 1)
-          a[0].mesh.scale.set(m)
+          a[0].mesh.scale.set(m.x, m.y)
         }
       }
     }
+  }
+
+  scroll(e) {
+    const { pixelY, pixelX } = normalizeWheel(e)
+
+    const relativeSpeed = Math.min(
+      100,
+      Math.max(Math.abs(pixelX), Math.abs(pixelY))
+    )
+
+    const scrollSpeed = relativeSpeed * 0.01
+    // const scrollLimit = getScrollLimit(width)
+    let direction = "U"
+
+    if (pixelY > 0) {
+      direction = "U"
+    } else {
+      direction = "D"
+    }
+
+    if (scrollSpeed > 0 && direction === "U" && STATE.imgState === 0) {
+      // Go to next state
+      STATE.dispatch("addImgState", [1])
+      // Update the coor and sizes
+      this.transition()
+      // Play transition
+      STATE.transition.play()
+    }
+
+    // UPDATE plane positions here
   }
 
   transition() {

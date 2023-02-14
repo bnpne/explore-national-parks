@@ -15,15 +15,17 @@ export default class HomeMedia extends Media {
     this.transitioned = false
   }
 
-  init({ tex, element, index, viewport, screen, scene }) {
+  init({ tex, index, viewport, screen, scene, col, row }) {
     super.init({
       tex,
-      element,
       index,
       viewport,
       screen,
       scene,
     })
+
+    this.col = col
+    this.row = row
 
     if (STATE.imgState === 0) {
       if (this.index === 0) {
@@ -46,11 +48,16 @@ export default class HomeMedia extends Media {
     this.defaultHeight = height
 
     this.mesh.scale.set(this.defaultWidth, this.defaultHeight)
+    this.material.uniforms.planeDim.value = [
+      this.defaultWidth,
+      this.defaultHeight,
+    ]
   }
 
   posX() {
-    const { start: colPos } = getColumnPos(this.screen, 6, this.element, 0)
-    this.x = getPositionX(this.mesh.scale, this.viewport, this.screen, colPos)
+    const { start: colPos } = getColumnPos(this.screen, 12, this.col, 16)
+    const center = colPos + 7.5
+    this.x = getPositionX(this.mesh.scale, this.viewport, this.screen, center)
 
     this.mesh.position.x = this.x
   }
@@ -62,13 +69,13 @@ export default class HomeMedia extends Media {
 
       this.mesh.position.y = this.y
     } else if (STATE.imgState === 1) {
-      const { start: rowPos } = getRowPos(this.screen, 400, this.element, 16)
+      const { start: rowPos } = getRowPos(this.screen, 367.5, this.row, 16)
       this.y = getPositionY(this.mesh.scale, this.viewport, this.screen, rowPos)
 
       // Don't set it because we need to transition
       // this.mesh.position.y = this.y
       if (!this.transitioned) {
-        STATE.transition.to(this.mesh.position, { y: this.y }, "start")
+        STATE.transition.to(this.mesh.position, { y: this.y }, "<6%")
       } else {
         this.mesh.position.y = this.y
       }
@@ -80,9 +87,7 @@ export default class HomeMedia extends Media {
       return
     }
 
-    this.scale()
-    this.posX()
-    this.posY()
+    this.createBounds()
     this.transitioned = true
   }
 }

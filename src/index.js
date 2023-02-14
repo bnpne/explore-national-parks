@@ -24,16 +24,16 @@ class App {
   }
 
   initState() {
-    CustomEase.create("main", "0, 0.55, 0.45, 1")
-    CustomEase.create("second", "0.23, 0, 0.23, 1")
+    CustomEase.create("quintIn", "0.64, 0, 0.78, 0")
+    CustomEase.create("quintOut", "0.22, 1, 0.36, 1")
     STATE.texList = []
     STATE.mediaList = []
 
     STATE.timeline = gsap.timeline({
       paused: true,
       defaults: {
-        duration: 0.3,
-        ease: "second",
+        duration: 0.6,
+        ease: "quintIn",
       },
       autoRemoveChildren: true,
       smoothChildTiming: true,
@@ -43,8 +43,8 @@ class App {
       paused: true,
       smoothChildTiming: true,
       defaults: {
-        duration: 0.3,
-        ease: "second",
+        duration: 0.6,
+        ease: "quintOut",
       },
     })
     STATE.percent = 0
@@ -53,6 +53,7 @@ class App {
     STATE.selectedScale = null
     STATE.imgState = 0
     STATE.imgPos = []
+    STATE.gallery = []
 
     // Functions
     STATE.addTex = function (tex) {
@@ -95,6 +96,9 @@ class App {
       this.selectedPos = null
       this.selectedScale = null
     }
+    STATE.addGallery = function (gallery) {
+      this.imgPos.push(gallery)
+    }
   }
 
   createCanvas() {
@@ -134,6 +138,10 @@ class App {
     if (this.canvas) this.canvas.click(e)
   }
 
+  scroll(e) {
+    if (this.canvas) this.canvas.scroll(e)
+  }
+
   resize() {
     if (this.canvas) this.canvas.resize()
   }
@@ -149,6 +157,7 @@ class App {
     window.addEventListener("resize", this.resize.bind(this))
     window.addEventListener("mousemove", this.hover.bind(this))
     window.addEventListener("click", this.click.bind(this))
+    window.addEventListener("wheel", this.scroll.bind(this))
   }
 }
 
