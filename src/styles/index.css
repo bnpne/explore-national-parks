@@ -14,7 +14,8 @@ html {
   user-select: none;
   width: 100%;
   font-family: "Helvetica Neue";
-  font-weight: 700;
+  font-weight: 500;
+  text-transform: uppercase;
 }
 
 body {
@@ -114,16 +115,16 @@ p {
   width: 100%;
   height: 100%;
   background: #151515;
+  color: #fff;
   position: absolute;
   z-index: 9999;
   top: 0;
   left: 0;
 }
 .percent {
-  font-family: "IBM Plex Mono", monospace;
   position: absolute;
-  top: 1.6rem;
-  left: 1.6rem;
-  /* transform: translate(-50%, -50%); */
-  font-size: 3.2rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.6rem;
 }

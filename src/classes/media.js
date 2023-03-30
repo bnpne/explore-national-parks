@@ -8,22 +8,28 @@ export default class Media {
   // Initialize functiom
   // creates mesh and material
   // sets bounds
-  init({ tex, viewport, screen, scene, index }) {
+  init({ tex, viewport, screen, scene, index, mouse }) {
     this.tex = tex
     this.viewport = viewport
     this.screen = screen
     this.scene = scene
     this.index = index
+    this.mouse = mouse
 
-    this.geometry = new THREE.PlaneGeometry(1, 1)
+    ///////////////// IMAGE TEXTURE ///////////////////
 
     // Basic image material
-    this.material = new THREE.RawShaderMaterial({
-      uniforms: {
-        tex: { value: 0 },
-        planeDim: { value: [1, 1] },
-        imgDim: { value: [1, 1] },
+    this.material = new THREE.ShaderMaterial({
+      extensions: {
+        derivatives: "#extension GL_OES_standard_derivatives : enable",
       },
+      uniforms: {
+        resolution: { value: new THREE.Vector4() },
+        tex: { value: 0 },
+        dataTex: { value: 0 },
+        mouseCoor: { value: this.mouse },
+      },
+      transparent: true,
       fragmentShader: fragmentShader,
       vertexShader: vertexShader,
     })
@@ -34,14 +40,12 @@ export default class Media {
   }
 
   createMesh() {
+    this.geometry = new THREE.PlaneGeometry(1, 1)
     this.material.transparent = true
     this.material.uniforms.tex.value = this.tex
-    this.material.uniforms.imgDim.value = [
-      this.tex.source.data.naturalWidth,
-      this.tex.source.data.naturalHeight,
-    ]
-    this.material.side = THREE.DoubleSide
+    this.material.uniforms.tex.value.needsUpdate = true
 
+    this.material.side = THREE.DoubleSide
     this.mesh = new THREE.Mesh(this.geometry, this.material)
 
     this.scene.add(this.mesh)
@@ -51,11 +55,6 @@ export default class Media {
     this.scale()
     this.posX()
     this.posY()
-
-    this.material.uniforms.planeDim.value = [
-      this.mesh.scale.x,
-      this.mesh.scale.y,
-    ]
   }
 
   scale() {

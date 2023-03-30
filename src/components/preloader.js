@@ -1,6 +1,6 @@
 import Emitter from "../classes/emitter"
 import * as THREE from "three"
-import { getGallery, STATE } from "../lib/"
+import { getGallery, STATE, loaderWords } from "../lib/"
 import img1 from "../../assets/tyler-nix-d1E3WP-ANRo-unsplash.jpg"
 
 export default class Preloader extends Emitter {
@@ -30,8 +30,9 @@ export default class Preloader extends Emitter {
         // TEST
         const test = new Image()
         test.src = img1
+
         await this.loadTexture(test).then((t) => {
-          this.percent.innerHTML = `${STATE.percent * 3}`
+          this.percent.innerHTML = loaderWords[STATE.percent]
           list.push(t)
         })
         if (STATE.percent === e.length - 1) {

@@ -12,6 +12,19 @@ export const IMG_COORD = [
   { col: 11, row: 3 },
 ]
 
+export const loaderWords = [
+  "triangle",
+  "quadrilateral",
+  "pentagon",
+  "hexagon",
+  "heptagon",
+  "octogon",
+  "nonagon",
+  "decagon",
+  "hendecagon",
+  "dodecagon",
+]
+
 export const STATE = new State()
 
 const PROJECT_ID = "r21elry8"

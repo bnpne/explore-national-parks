@@ -1,22 +1,18 @@
-precision highp float;
-
-uniform vec2 imgDim;
-uniform vec2 planeDim;
+uniform sampler2D dataTex;
 uniform sampler2D tex;
-
+uniform vec4 resolution;
 varying vec2 vUv;
+varying vec3 vPosition;
+uniform vec2 mouseCoor;
+float PI = 3.141592653589793238;
 
-void main() {
-  vec2 ratio = vec2(
-    min((planeDim.x / planeDim.y) / (imgDim.x / imgDim.y), 1.0),
-    min((planeDim.y / planeDim.x) / (imgDim.y / imgDim.x), 1.0)
-  );
-
-  vec2 uv = vec2(
-    vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
-    vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
-  );
-
-  gl_FragColor.rgb = texture2D(tex, uv).rgb;
-  gl_FragColor.a = 1.0;
+void main()	{
+	vec2 newUV = (vUv - vec2(0.5))*resolution.zw + vec2(0.5);
+	vec4 color = texture2D(tex,newUV);
+  vec4 offset = texture2D(dataTex, vUv);
+  gl_FragColor = vec4(vUv,0.0,1.);
+	gl_FragColor = vec4(offset.r, 0., 0., 1.);
+	gl_FragColor = color;
+	/* gl_FragColor = texture2D(tex,newUV - 0.02*offset.rg); */
 }
+

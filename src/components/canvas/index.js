@@ -18,6 +18,7 @@ export default class Canvas {
       height: window.innerHeight,
     }
     this.renderer.setSize(this.screen.width, this.screen.height)
+    // this.effec = new THREE.AsciiEffect(this.renderer)
     this.scene = new THREE.Scene()
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -29,7 +30,15 @@ export default class Canvas {
     this.scene.add(this.camera)
 
     this.raycaster = new THREE.Raycaster()
-    this.mouse = new THREE.Vector2()
+
+    this.mouse = {
+      x: 0,
+      y: 0,
+      prevX: 0,
+      prevY: 0,
+      vX: 0,
+      vY: 0,
+    }
 
     this.resize()
   }
@@ -54,6 +63,7 @@ export default class Canvas {
         screen: this.screen,
         col: IMG_COORD[i].col,
         row: IMG_COORD[i].row,
+        mouse: this.mouse,
       })
 
       return homeMedia
@@ -70,14 +80,28 @@ export default class Canvas {
     this.mouse.x = (e.clientX / this.screen.width) * 2 - 1
     this.mouse.y = -(e.clientY / this.screen.height) * 2 + 1
 
+    this.mouse.vX = this.mouse.x - this.mouse.prevX
+    this.mouse.vY = this.mouse.y - this.mouse.prevY
+
+    this.mouse.prevX = this.mouse.x
+    this.mouse.prevY = this.mouse.y
+
     this.intersectedObjects = this.intersect(this.mouse)
     if (this.intersectedObjects.length > 0 && this.intersectedObjects[0]) {
       if (!STATE.selected) {
         document.body.style.cursor = "pointer"
       }
+
+      // const a = this.homeMediaList.filter(
+      //   (el) => el.mesh === this.intersectedObjects[0].object
+      // )
+      //
+      // if (a) a[0].hover(this.mouse)
     } else {
       document.body.style.cursor = "default"
     }
+    if (this.homeMediaList)
+      this.homeMediaList.forEach((el) => el.hover(this.mouse))
   }
 
   click(e) {
@@ -169,6 +193,9 @@ export default class Canvas {
     }
     this.renderer.setSize(this.screen.width, this.screen.height)
     this.renderer.setPixelRatio(window.devicePixelRatio)
+    // ASCII
+    // this.effect = new THREE.AsciiEffect(this.renderer)
+
     this.camera.aspect = this.screen.width / this.screen.height
     this.camera.updateProjectionMatrix()
 
@@ -191,5 +218,7 @@ export default class Canvas {
   loop() {
     if (this.homeMediaList) this.homeMediaList.forEach((el) => el.loop())
     this.renderer.render(this.scene, this.camera)
+
+    // this.effect.render()
   }
 }
