@@ -1,0 +1,67 @@
+#park-carousel {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  // height: 55rem;
+  z-index: 10;
+  // padding: 1.6rem;
+
+  .hero {
+    @include font-oversized;
+    max-width: 75vw;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .park {
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    gap: 1rem;
+
+    &-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      div {
+        @include font-giant;
+      }
+    }
+
+    &-pre {
+      @include font-medium;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 5rem;
+      margin-left: 10rem;
+      padding: 1rem 0;
+
+      &__latLong {
+        display: flex;
+        gap: 1rem;
+        .park-pre__lat:after {
+          content: ",";
+        }
+      }
+
+      &__numState {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      &__num {
+        height: 5.6rem;
+        width: 5.6rem;
+        border-radius: 50%;
+        text-align: center;
+        border: 2px $timberwolf solid;
+        padding: 0.55rem;
+      }
+    }
+  }
+}

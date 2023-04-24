@@ -1,0 +1,95 @@
+:root {
+}
+
+* {
+  margin: 0;
+  overflow: hidden;
+}
+
+html {
+  font-size: calc(100vw / 1920 * 10);
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  user-select: none;
+  width: 100%;
+  font-family: "Helvetica Neue";
+
+  text-transform: uppercase;
+}
+
+body {
+  margin: 0;
+  color: $timberwolf;
+  background: $dusk;
+  cursor: default;
+}
+
+ul {
+  list-style-type: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 0px;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.1rem;
+  letter-spacing: -2%;
+}
+
+nav {
+  margin: 1.6rem 0;
+}
+
+div {
+  overflow: hidden;
+}
+
+#main {
+  position: absolute;
+  height: 100%;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+
+  font-weight: 400;
+  font-size: 2.4rem;
+  line-height: 2.4rem;
+
+  // CONTAINER
+  .c {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    // WRAPPER
+    .w {
+      position: relative;
+      padding: 0 1.6rem;
+      height: 100%;
+    }
+  }
+
+  // NAV
+  .n {
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+}
+
+// CANVAS
+#r {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}

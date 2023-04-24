@@ -1,0 +1,35 @@
+//////////// TYPOGRAPHY MIXINS ////////////
+@mixin font-giant {
+  font-size: 85rem;
+  line-height: 66.3rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+@mixin font-oversized {
+  font-size: 20rem;
+  line-height: 16rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+@mixin font-large {
+  font-family: "Helvetica Neue", "sans serif";
+  font-size: 18rem;
+  line-height: 14rem;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  padding: 0 0.03em;
+}
+
+@mixin font-medium {
+  font-family: "Helvetica Neue", "sans serif";
+  font-size: 5.6rem;
+  line-height: 5.5rem;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  padding: 0 0.03em;
+}
+////////////////////////////////////

@@ -5,7 +5,8 @@ import Preloader from "./components/preloader"
 import Home from "./pages/home"
 import { STATE } from "./lib"
 
-import "./styles/index.css"
+import "./styles/index.scss"
+import { splitPhrase } from "./utils/format"
 
 gsap.registerPlugin(CustomEase)
 
@@ -26,6 +27,8 @@ class App {
   initState() {
     CustomEase.create("quintIn", "0.64, 0, 0.78, 0")
     CustomEase.create("quintOut", "0.22, 1, 0.36, 1")
+    CustomEase.create("quintInOut", "0.64, 0, 0.78, 0")
+    CustomEase.create("cubicOut", "0.33, 1, 0.68, 1")
     STATE.texList = []
     STATE.mediaList = []
 
@@ -33,17 +36,16 @@ class App {
       paused: true,
       defaults: {
         duration: 0.6,
-        ease: "quintIn",
+        ease: "cubicOut",
       },
       autoRemoveChildren: true,
       smoothChildTiming: true,
-      onComplete: () => this.preloader.hide(),
     })
     STATE.transition = gsap.timeline({
       paused: true,
       smoothChildTiming: true,
       defaults: {
-        duration: 0.6,
+        duration: 0.5,
         ease: "quintOut",
       },
     })
@@ -53,8 +55,7 @@ class App {
     STATE.selectedScale = null
     STATE.imgState = 0
     STATE.imgPos = []
-    STATE.gallery = []
-
+    STATE.carousel = []
     // Functions
     STATE.addTex = function (tex) {
       this.texList.push(tex)
@@ -96,8 +97,8 @@ class App {
       this.selectedPos = null
       this.selectedScale = null
     }
-    STATE.addGallery = function (gallery) {
-      this.imgPos.push(gallery)
+    STATE.addCarousel = function (carousel) {
+      this.carousel.push(carousel)
     }
   }
 
@@ -118,6 +119,28 @@ class App {
     this.currentPage.create()
   }
 
+  initAnimations() {
+    let n = document.querySelector(".n")
+    for (const c of n.children) {
+      STATE.timeline.from(c, { y: "100%" }, "endPreload")
+    }
+
+    if (this.canvas) {
+      STATE.timeline.addLabel("endGL", "<70%")
+
+      let h = document.querySelector(".hero")
+      h = splitPhrase(h)
+
+      Array.from(h.children).forEach((el, i) => {
+        let w = el.querySelector(".word__el")
+
+        i == 0
+          ? STATE.timeline.from(w, { y: "100%" }, "endGL")
+          : STATE.timeline.from(w, { y: "100%" }, "<10%")
+      })
+    }
+  }
+
   preload() {
     this.preloader = new Preloader()
     this.preloader.once("completed", () => this.loaded())
@@ -126,6 +149,9 @@ class App {
   loaded() {
     this.resize()
     this.canvas.loaded(this.url)
+    // console.log(STATE.carousel)
+    // STATE.carousel[0][0].style.display = "flex"
+    this.initAnimations()
     // this.currentPage.show()
     STATE.timeline.play()
   }

@@ -1,0 +1,12 @@
+.word {
+  &__wrapper {
+    background: $dusk;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+  }
+
+  &__el {
+    display: inline-block;
+  }
+}

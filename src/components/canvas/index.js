@@ -1,7 +1,11 @@
 import * as THREE from "three"
-import { IMG_COORD, STATE } from "../../lib"
-import HomeMedia from "./homeMedia"
+import { STATE } from "../../lib"
+import { getScrollLimitHeight } from "../../utils/format"
 import normalizeWheel from "normalize-wheel"
+import CarouselMedia from "../canvas/carouselMedia"
+
+import vertexShader from "../../shaders/vertex.glsl"
+import fragmentShader from "../../shaders/fragment.glsl"
 
 export default class Canvas {
   constructor({ el, url }) {
@@ -18,7 +22,6 @@ export default class Canvas {
       height: window.innerHeight,
     }
     this.renderer.setSize(this.screen.width, this.screen.height)
-    // this.effec = new THREE.AsciiEffect(this.renderer)
     this.scene = new THREE.Scene()
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -28,9 +31,7 @@ export default class Canvas {
     )
     this.camera.position.set(0, 0, 5)
     this.scene.add(this.camera)
-
     this.raycaster = new THREE.Raycaster()
-
     this.mouse = {
       x: 0,
       y: 0,
@@ -40,33 +41,59 @@ export default class Canvas {
       vY: 0,
     }
 
+    ///////////////////////// IMAGE TEXTURE //////////////////////////
+    // Basic image material
+    // Use this to clone
+    this.material = new THREE.ShaderMaterial({
+      extensions: {
+        derivatives: "#extension GL_OES_standard_derivatives : enable",
+      },
+      uniforms: {
+        resolution: { value: new THREE.Vector4() },
+        tex: { value: 0 },
+        dataTex: { value: 0 },
+        mouseCoor: { value: this.mouse },
+      },
+      transparent: true,
+      fragmentShader: fragmentShader,
+      vertexShader: vertexShader,
+    })
+
+    this.clock = new THREE.Clock()
+
     this.resize()
   }
 
   loaded(url) {
     if (url === "/") {
-      this.createHomeMedia()
+      this.createCarousel()
     }
     this.url = url
     this.resize()
   }
 
-  createHomeMedia() {
+  createCarousel() {
     const temp = STATE.texList[0]
-    this.homeMediaList = temp.map((tex, i) => {
-      const homeMedia = new HomeMedia()
-      homeMedia.init({
+
+    this.carouselMedia = temp.map((tex, i) => {
+      // Clone material
+      let newMat = this.material.clone()
+
+      // Create Carousel Media
+      const carouselMedia = new CarouselMedia()
+
+      // Initialize media which creates texture and positions on webpage
+      carouselMedia.init({
         tex: tex,
         index: i,
         viewport: this.viewport,
         scene: this.scene,
         screen: this.screen,
-        col: IMG_COORD[i].col,
-        row: IMG_COORD[i].row,
         mouse: this.mouse,
+        material: newMat,
       })
 
-      return homeMedia
+      return carouselMedia
     })
   }
 
@@ -77,31 +104,31 @@ export default class Canvas {
   }
 
   hover(e) {
-    this.mouse.x = (e.clientX / this.screen.width) * 2 - 1
-    this.mouse.y = -(e.clientY / this.screen.height) * 2 + 1
-
-    this.mouse.vX = this.mouse.x - this.mouse.prevX
-    this.mouse.vY = this.mouse.y - this.mouse.prevY
-
-    this.mouse.prevX = this.mouse.x
-    this.mouse.prevY = this.mouse.y
-
-    this.intersectedObjects = this.intersect(this.mouse)
-    if (this.intersectedObjects.length > 0 && this.intersectedObjects[0]) {
-      if (!STATE.selected) {
-        document.body.style.cursor = "pointer"
-      }
-
-      // const a = this.homeMediaList.filter(
-      //   (el) => el.mesh === this.intersectedObjects[0].object
-      // )
-      //
-      // if (a) a[0].hover(this.mouse)
-    } else {
-      document.body.style.cursor = "default"
-    }
-    if (this.homeMediaList)
-      this.homeMediaList.forEach((el) => el.hover(this.mouse))
+    // this.mouse.x = (e.clientX / this.screen.width) * 2 - 1
+    // this.mouse.y = -(e.clientY / this.screen.height) * 2 + 1
+    //
+    // this.mouse.vX = this.mouse.x - this.mouse.prevX
+    // this.mouse.vY = this.mouse.y - this.mouse.prevY
+    //
+    // this.mouse.prevX = this.mouse.x
+    // this.mouse.prevY = this.mouse.y
+    //
+    // this.intersectedObjects = this.intersect(this.mouse)
+    // if (this.intersectedObjects.length > 0 && this.intersectedObjects[0]) {
+    //   if (!STATE.selected) {
+    //     document.body.style.cursor = "pointer"
+    //   }
+    //
+    //   // const a = this.homeMediaList.filter(
+    //   //   (el) => el.mesh === this.intersectedObjects[0].object
+    //   // )
+    //   //
+    //   // if (a) a[0].hover(this.mouse)
+    // } else {
+    //   document.body.style.cursor = "default"
+    // }
+    // if (this.homeMediaList)
+    //   this.homeMediaList.forEach((el) => el.hover(this.mouse))
   }
 
   click(e) {
@@ -155,35 +182,56 @@ export default class Canvas {
 
     const relativeSpeed = Math.min(
       100,
-      Math.max(Math.abs(pixelX), Math.abs(pixelY))
+      Math.max(Math.abs(pixelY), Math.abs(pixelY))
     )
+    this.speed = relativeSpeed * 0.01
 
-    const scrollSpeed = relativeSpeed * 0.01
-    // const scrollLimit = getScrollLimit(width)
-    let direction = "U"
-
+    this.direction = ""
     if (pixelY > 0) {
-      direction = "U"
+      this.direction = "U"
     } else {
-      direction = "D"
+      this.direction = "D"
     }
 
-    if (scrollSpeed > 0 && direction === "U" && STATE.imgState === 0) {
-      // Go to next state
-      STATE.dispatch("addImgState", [1])
-      // Update the coor and sizes
+    if (STATE.imgState === 0 && this.direction === "U") {
       this.transition()
-      // Play transition
-      STATE.transition.play()
-    }
+    } else if (STATE.imgState === 1) {
+      if (
+        Math.abs(Math.round(this.carouselMedia[0].currentY)) === 0 &&
+        this.direction === "D"
+      ) {
+        STATE.dispatch("addImgState", [0])
+        this.transition()
+      } else {
+        const w =
+          this.carouselMedia[0].defaultDim.defaultHeight +
+          this.carouselMedia[0].defaultGap
 
-    // UPDATE plane positions here
+        if (this.carouselMedia) {
+          this.carouselMedia.forEach((el) => {
+            let target =
+              el.targetY + (this.direction === "D" ? -this.speed : this.speed)
+            target = Math.max(
+              el.bottomBoundary,
+              Math.min(el.topBoundary, target)
+            )
+            el.targetY = target
+
+            el.snap = Math.round(target / w) * w
+
+            el.onCheckDebounce()
+          })
+        }
+      }
+    }
   }
 
   transition() {
-    if (this.homeMediaList) {
-      this.homeMediaList.forEach((el) => el.transition())
-    }
+    this.carouselMedia.forEach((el) => {
+      STATE.imgState === 0
+        ? (el.targetY = el.bottomBoundary)
+        : (el.targetY = this.topBoundary + this.viewport.height)
+    })
   }
 
   resize() {
@@ -193,8 +241,6 @@ export default class Canvas {
     }
     this.renderer.setSize(this.screen.width, this.screen.height)
     this.renderer.setPixelRatio(window.devicePixelRatio)
-    // ASCII
-    // this.effect = new THREE.AsciiEffect(this.renderer)
 
     this.camera.aspect = this.screen.width / this.screen.height
     this.camera.updateProjectionMatrix()
@@ -208,17 +254,36 @@ export default class Canvas {
       width: width,
     }
 
-    if (this.homeMediaList) {
-      this.homeMediaList.forEach((el) =>
-        el.resize({ viewport: this.viewport, screen: this.screen })
+    const n = 250 / 1920
+    this.scrollLimit = getScrollLimitHeight(
+      n,
+      250 / 175,
+      this.viewport.width,
+      0.05
+    )
+
+    if (this.carouselMedia) {
+      this.carouselMedia.forEach((el) =>
+        el.resize({
+          viewport: this.viewport,
+          screen: this.screen,
+          scrollLimit: this.scrollLimit,
+        })
       )
     }
   }
 
   loop() {
-    if (this.homeMediaList) this.homeMediaList.forEach((el) => el.loop())
+    // Render Scene
     this.renderer.render(this.scene, this.camera)
 
-    // this.effect.render()
+    if (this.carouselMedia) {
+      // Render rest of carousel
+      this.carouselMedia.forEach((el) => el.loop())
+
+      if (Math.abs(Math.round(this.carouselMedia[0].currentY)) === 0) {
+        STATE.dispatch("addImgState", [1])
+      }
+    }
   }
 }

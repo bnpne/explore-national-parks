@@ -1,3 +1,5 @@
+import { PARK_CAROUSEL } from "../lib"
+
 const WIDTH_RATIO = 0.08
 
 export function getImageDimensions(widthScale, widthRatio, canvasWidth) {
@@ -7,6 +9,15 @@ export function getImageDimensions(widthScale, widthRatio, canvasWidth) {
   }
 }
 
+export function getScrollLimitWidth(widthScale, widthRatio, canvasWidth, gap) {
+  const { width } = getImageDimensions(widthScale, widthRatio, canvasWidth)
+  return (PARK_CAROUSEL.length - 2) * (width + gap)
+}
+
+export function getScrollLimitHeight(widthScale, widthRatio, canvasWidth, gap) {
+  const { height } = getImageDimensions(widthScale, widthRatio, canvasWidth)
+  return (PARK_CAROUSEL.length - 2) * (height + gap)
+}
 /**
   This grid is based on a 12 column grid. To really make this random, I need to find the width of each column plus the position.
   I can then use the width and position to place each image when given a column span
@@ -51,4 +62,18 @@ export function getPositionY(planeScale, viewport, screen, y) {
     planeScale.y / 2 -
     (y / screen.height) * viewport.height
   )
+}
+
+////// THIS ALSO REPLACES THE HTML //////
+export function splitPhrase(phrase) {
+  let i = phrase.innerHTML.split(" ")
+  phrase.innerHTML = ""
+  i = i.map(
+    (w) =>
+      `<span class="word__wrapper"><span class="word__el">${w}</span></span>`
+  )
+  i.forEach((el) => {
+    phrase.innerHTML += el
+  })
+  return phrase
 }

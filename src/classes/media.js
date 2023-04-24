@@ -1,6 +1,6 @@
 import * as THREE from "three"
-import vertexShader from "../shaders/vertex.glsl"
-import fragmentShader from "../shaders/fragment.glsl"
+// import vertexShader from "../shaders/vertex.glsl"
+// import fragmentShader from "../shaders/fragment.glsl"
 
 export default class Media {
   constructor() {}
@@ -8,7 +8,7 @@ export default class Media {
   // Initialize functiom
   // creates mesh and material
   // sets bounds
-  init({ tex, viewport, screen, scene, index, mouse }) {
+  init({ tex, viewport, screen, scene, index, mouse, material }) {
     this.tex = tex
     this.viewport = viewport
     this.screen = screen
@@ -19,24 +19,27 @@ export default class Media {
     ///////////////// IMAGE TEXTURE ///////////////////
 
     // Basic image material
-    this.material = new THREE.ShaderMaterial({
-      extensions: {
-        derivatives: "#extension GL_OES_standard_derivatives : enable",
-      },
-      uniforms: {
-        resolution: { value: new THREE.Vector4() },
-        tex: { value: 0 },
-        dataTex: { value: 0 },
-        mouseCoor: { value: this.mouse },
-      },
-      transparent: true,
-      fragmentShader: fragmentShader,
-      vertexShader: vertexShader,
-    })
+    // this.material = new THREE.ShaderMaterial({
+    //   extensions: {
+    //     derivatives: "#extension GL_OES_standard_derivatives : enable",
+    //   },
+    //   uniforms: {
+    //     resolution: { value: new THREE.Vector4() },
+    //     tex: { value: 0 },
+    //     dataTex: { value: 0 },
+    //     mouseCoor: { value: this.mouse },
+    //   },
+    //   transparent: true,
+    //   fragmentShader: fragmentShader,
+    //   vertexShader: vertexShader,
+    // })
+
+    // Get Material that is cloned from canvas
+    this.material = material
 
     this.createMesh()
     this.createBounds()
-    this.resize()
+    // this.resize()
   }
 
   createMesh() {
